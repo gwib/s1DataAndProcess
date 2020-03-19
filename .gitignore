@@ -5,6 +5,7 @@
 # Downloaded Data Files
 data/
 Data/
+dataSLC
 
 *.zip
 *.dim
