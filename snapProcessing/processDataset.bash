@@ -52,4 +52,5 @@ for F in $(ls -1d "${sourceDirectory}"/S1*.zip); do #TODO: change filename and e
   sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
   ${gptPath} ${graphXmlPath} -e -t ${targetFile} ${sourceFile}
+  sleep 3m
 done
