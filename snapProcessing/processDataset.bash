@@ -7,7 +7,7 @@
 ############################################
 
 # adapt this path to your needs
-export PATH=~/progs/snap/bin:$PATH
+#export PATH=~/progs/snap/bin:$PATH
 gptPath="gpt"
 
 ############################################
@@ -18,16 +18,17 @@ gptPath="gpt"
 graphXmlPath="$1"
 
 # second parameter is a path to a parameter file
-parameterFilePath="$2"
+# parameters are hard-coded in XML file
+#parameterFilePath="$2"
 
 # use third parameter for path to source products
-sourceDirectory="$3"
+sourceDirectory="$2"
 
 # use fourth parameter for path to target products
-targetDirectory="$4"
+targetDirectory="$3"
 
 # the fifth parameter is a file prefix for the target product name, typically indicating the type of processing
-targetFilePrefix="$5"
+targetFilePrefix="$4"
 
    
 ############################################
@@ -47,8 +48,8 @@ removeExtension() {
 mkdir -p "${targetDirectory}"
 
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
-for F in $(ls -1d "${sourceDirectory}"/S2*.SAFE); do
+for F in $(ls -1d "${sourceDirectory}"/S1*.zip); do #TODO: change filename and extension
   sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  ${gptPath} ${graphXmlPath} -e -p ${parameterFilePath} -t ${targetFile} ${sourceFile}
+  ${gptPath} ${graphXmlPath} -e -t ${targetFile} ${sourceFile}
 done
