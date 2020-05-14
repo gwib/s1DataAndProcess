@@ -1,0 +1,1 @@
+sh processDataset.bash WinsvoldGRDsubsetFirst_batch.xml "/shared/thesis/GRDTest_orig/" "/shared/thesis/bulkProcessed" WinsvoldGRD_

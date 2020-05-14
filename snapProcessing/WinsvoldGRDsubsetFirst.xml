@@ -1,16 +1,9 @@
 <graph id="Graph">
   <version>1.0</version>
-  <node id="Read">
-    <operator>Read</operator>
-    <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/home/rus/shared/thesis/GRD_171_orig/S1B_IW_GRDH_1SDH_20190705T101603_20190705T101628_016997_01FFAC_C4BC.zip</file>
-    </parameters>
-  </node>
   <node id="Apply-Orbit-File">
     <operator>Apply-Orbit-File</operator>
     <sources>
-      <sourceProduct refid="Read"/>
+      <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <orbitType>Sentinel Precise (Auto Download)</orbitType>
@@ -155,7 +148,7 @@
       <sourceProduct refid="LinearToFromdB"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/home/rus/shared/thesis/processedData/Subset2_S1B_IW_GRDH_1SDH_20190705T101603_20190705T101628_016997_01FFAC_C4BC_Orb_NR_Cal_Spk_TC_dB_tryGraph.dim</file>
+      <file>/home/rus/shared/thesis/processedData/Winsvold_Subset2_S1B_IW_GRDH_1SDH_20190705T101603_20190705T101628_016997_01FFAC_C4BC_Orb_NR_Cal_Spk_TC_dB_tryGraph.dim</file>
       <formatName>BEAM-DIMAP</formatName>
     </parameters>
   </node>
