@@ -1,7 +1,7 @@
 <graph id="WinsvoldBatchProcessing">
   <version>1.0</version>
   <node id="Apply-Orbit-File">
-    <operator>Apply-Orbit-File</operator>
+<!---    <operator>Apply-Orbit-File</operator>
     <sources>
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
@@ -57,11 +57,11 @@
       <outputGammaBand>false</outputGammaBand>
       <outputBetaBand>false</outputBetaBand>
     </parameters>
-  </node>
+  </node> -->
   <node id="Speckle-Filter">
     <operator>Speckle-Filter</operator>
     <sources>
-      <sourceProduct refid="Calibration"/>
+      <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
