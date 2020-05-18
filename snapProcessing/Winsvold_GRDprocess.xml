@@ -1,63 +1,5 @@
 <graph id="WinsvoldBatchProcessing">
   <version>1.0</version>
-  <node id="Apply-Orbit-File">
-<!---    <operator>Apply-Orbit-File</operator>
-    <sources>
-      <sourceProduct>${sourceProduct}</sourceProduct>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <orbitType>Sentinel Precise (Auto Download)</orbitType>
-      <polyDegree>3</polyDegree>
-      <continueOnFail>false</continueOnFail>
-    </parameters>
-  </node>
-  <node id="ThermalNoiseRemoval">
-    <operator>ThermalNoiseRemoval</operator>
-    <sources>
-      <sourceProduct refid="Apply-Orbit-File"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-      <removeThermalNoise>true</removeThermalNoise>
-      <reIntroduceThermalNoise>false</reIntroduceThermalNoise>
-    </parameters>
-  </node>
-  <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="ThermalNoiseRemoval"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <region>0,0,0,0</region>
-      <referenceBand/>
-      <geoRegion>POLYGON ((-55.29999923706055 70.2936019897461, -51.70000076293945 70.2936019897461, -51.70000076293945 69.22410583496094, -55.29999923706055 69.22410583496094, -55.29999923706055 70.2936019897461, -55.29999923706055 70.2936019897461))</geoRegion>
-      <subSamplingX>1</subSamplingX>
-      <subSamplingY>1</subSamplingY>
-      <fullSwath>false</fullSwath>
-      <tiePointGridNames/>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node>
-  <node id="Calibration">
-    <operator>Calibration</operator>
-    <sources>
-      <sourceProduct refid="Subset"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <auxFile>Product Auxiliary File</auxFile>
-      <externalAuxFile/>
-      <outputImageInComplex>false</outputImageInComplex>
-      <outputImageScaleInDb>false</outputImageScaleInDb>
-      <createGammaBand>false</createGammaBand>
-      <createBetaBand>false</createBetaBand>
-      <selectedPolarisations>HH,HV</selectedPolarisations>
-      <outputSigmaBand>true</outputSigmaBand>
-      <outputGammaBand>false</outputGammaBand>
-      <outputBetaBand>false</outputBetaBand>
-    </parameters>
-  </node> -->
   <node id="Speckle-Filter">
     <operator>Speckle-Filter</operator>
     <sources>
@@ -142,14 +84,4 @@
       <sourceBands/>
     </parameters>
   </node>
-  <!-- <node id="Write">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="LinearToFromdB"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/home/rus/shared/thesis/processedData/Subset2_S1B_IW_GRDH_1SDH_20190705T101603_20190705T101628_016997_01FFAC_C4BC_Orb_NR_Cal_Spk_TC_dB_tryGraph.dim</file>
-      <formatName>BEAM-DIMAP</formatName>
-    </parameters>
-  </node> -->
 </graph>
