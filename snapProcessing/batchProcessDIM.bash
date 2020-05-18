@@ -55,6 +55,8 @@ for F in $(ls -1d "${sourceDirectory}"/*.dim); do #TODO: change filename and ext
   	echo "${targetFile} already exists. No action needed"
   else
 	echo "${targetFile} does not exist. Processing graph."
-fi
-  #${gptPath} ${graphXmlPath} -e -t ${targetFile} ${sourceFile} -x
+	${gptPath} ${graphXmlPath} -e -t ${targetFile} ${sourceFile} -x
+  fi
+	echo "----------------------------------------------"
+	echo "----------------------------------------------"
 done
