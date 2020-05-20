@@ -1,0 +1,80 @@
+<graph id="Graph">
+  <version>1.0</version>
+<node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${master}</file>
+    </parameters>
+  </node>
+  <node id="Read(2)">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>${slave}</file>
+    </parameters>
+  </node>
+<!--   <node id="ProductSet-Reader">
+    <operator>ProductSet-Reader</operator>
+    <sources>
+  </node> -->
+  <node id="DEM-Assisted-Coregistration">
+    <operator>DEM-Assisted-Coregistration</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+      <sourceProduct.1 refid="Read(2)"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <demName>ACE30</demName> <!-- TODO: fix DEM -->
+      <demResamplingMethod>BICUBIC_INTERPOLATION</demResamplingMethod>
+      <externalDEMFile/>
+      <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
+      <resamplingType>BISINC_5_POINT_INTERPOLATION</resamplingType>
+      <tileExtensionPercent>50</tileExtensionPercent>
+      <maskOutAreaWithoutElevation>true</maskOutAreaWithoutElevation>
+      <outputRangeAzimuthOffset>false</outputRangeAzimuthOffset>
+    </parameters>
+  </node>
+  <node id="Offset-Tracking">
+    <operator>Offset-Tracking</operator>
+    <sources>
+      <sourceProduct refid="DEM-Assisted-Coregistration"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <gridAzimuthSpacing>60</gridAzimuthSpacing>
+      <gridRangeSpacing>60</gridRangeSpacing>
+      <registrationWindowWidth>128</registrationWindowWidth>
+      <registrationWindowHeight>128</registrationWindowHeight>
+      <xCorrThreshold>0.1</xCorrThreshold>
+      <registrationOversampling>16</registrationOversampling>
+      <averageBoxSize>5</averageBoxSize>
+      <maxVelocity>5.0</maxVelocity>
+      <radius>4</radius>
+      <resamplingType>BICUBIC_INTERPOLATION</resamplingType>
+      <spatialAverage>true</spatialAverage>
+      <fillHoles>true</fillHoles>
+      <roiVector/>
+    </parameters>
+  </node>
+  <!---TODO: everything below here -->
+  <node id="Write(2)">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Offset-Tracking"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/home/rus/shared/Training/CRYO02_GlacierVelocity_Greenland_TutorialKit/Processing/Subset_S1A_IW_GRDH_1SDV_20190911T111835_20190923_Stack_Vel.dim</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="Subset"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/home/rus/shared/Training/CRYO02_GlacierVelocity_Greenland_TutorialKit/Processing/Subset_S1A_IW_GRDH_1SDV_20190911T111835_20190923_Stack.dim</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
+</graph>
