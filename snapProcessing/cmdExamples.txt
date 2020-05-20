@@ -1,0 +1,5 @@
+### Invoke Batch processing ####
+sh processDataset.bash WinsvoldGRDsubsetFirst_batch.xml "/shared/thesis/GRDTest_orig/" "/shared/thesis/bulkProcessed" WinsvoldGRD_
+
+### gpt with two input files ###
+gpt Offset_tracking.xml -Pmaster=<masterfileString> -Pslave=<slavefileString>
