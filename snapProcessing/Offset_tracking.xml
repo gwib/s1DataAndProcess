@@ -1,23 +1,15 @@
 <graph id="Graph">
   <version>1.0</version>
-<node id="Read">
+  <node id="Read">
     <operator>Read</operator>
     <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${master}</file>
-    </parameters>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement"/>
   </node>
   <node id="Read(2)">
     <operator>Read</operator>
     <sources/>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${slave}</file>
-    </parameters>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement"/>
   </node>
-<!--   <node id="ProductSet-Reader">
-    <operator>ProductSet-Reader</operator>
-    <sources>
-  </node> -->
   <node id="DEM-Assisted-Coregistration">
     <operator>DEM-Assisted-Coregistration</operator>
     <sources>
@@ -25,7 +17,7 @@
       <sourceProduct.1 refid="Read(2)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <demName>ACE30</demName> <!-- TODO: fix DEM -->
+      <demName>ACE30</demName>
       <demResamplingMethod>BICUBIC_INTERPOLATION</demResamplingMethod>
       <externalDEMFile/>
       <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
@@ -56,7 +48,6 @@
       <roiVector/>
     </parameters>
   </node>
-  <!---TODO: everything below here -->
   <node id="Write(2)">
     <operator>Write</operator>
     <sources>
@@ -67,14 +58,22 @@
       <formatName>BEAM-DIMAP</formatName>
     </parameters>
   </node>
-  <node id="Write">
-    <operator>Write</operator>
-    <sources>
-      <sourceProduct refid="Subset"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/home/rus/shared/Training/CRYO02_GlacierVelocity_Greenland_TutorialKit/Processing/Subset_S1A_IW_GRDH_1SDV_20190911T111835_20190923_Stack.dim</file>
-      <formatName>BEAM-DIMAP</formatName>
-    </parameters>
-  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+      <displayPosition x="20.0" y="135.0"/>
+    </node>
+    <node id="Read(2)">
+      <displayPosition x="17.0" y="39.0"/>
+    </node>
+    <node id="DEM-Assisted-Coregistration">
+      <displayPosition x="82.0" y="88.0"/>
+    </node>
+    <node id="Offset-Tracking">
+      <displayPosition x="378.0" y="89.0"/>
+    </node>
+    <node id="Write(2)">
+      <displayPosition x="545.0" y="89.0"/>
+    </node>
+  </applicationData>
 </graph>
