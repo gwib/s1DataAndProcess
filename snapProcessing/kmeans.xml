@@ -4,7 +4,7 @@
     <operator>Read</operator>
     <sources/>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/Users/GalinaJonat/Documents/IIKT/Thesis/processed/Sigma0_20200418/WinsvoldGRD_Sigma0_Subset_Orb_TN_Cal__S1B_IW_GRDH_1SDH_20200418T101605_20200418T101630_021197_028396_5FA1.dim</file>
+      <file>/shared/thesis/sigma0/WinsvoldGRD_Sigma0_Subset_Orb_TN_Cal__S1B_IW_GRDH_1SDH_20200418T101605_20200418T101630_021197_028396_5FA1.dim</file>
     </parameters>
   </node>
   <node id="KMeansClusterAnalysis">
@@ -16,28 +16,17 @@
       <clusterCount>14</clusterCount>
       <iterationCount>30</iterationCount>
       <randomSeed>31415</randomSeed>
-      <sourceBandNames>Sigma0_HH_db</sourceBandNames>
+      <sourceBandNames/>
       <roiMaskName/>
     </parameters>
   </node>
-<!--   <node id="BandSelect">
-    <operator>BandSelect</operator>
-    <sources>
-      <sourceProduct refid="Read"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <selectedPolarisations/>
-      <sourceBands>Sigma0_HH_db</sourceBands>
-      <bandNamePattern/>
-    </parameters>
-  </node> -->
   <node id="Write">
     <operator>Write</operator>
     <sources>
       <sourceProduct refid="KMeansClusterAnalysis"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/Users/GalinaJonat/Documents/IIKT/Thesis/processed/WinsvoldGRD_Sigma0_Subset_Orb_TN_Cal__S1B_IW_GRDH_1SDH_20200418T101605_20200418T101630_021197_028396_5FA1_CLUSTERS.dim</file>
+      <file>/shared/thesis/cluster/WinsvoldGRD_Sigma0_Subset_Orb_TN_Cal__S1B_IW_GRDH_1SDH_20200418T101605_20200418T101630_021197_028396_5FA1_CLUSTERS_HH_HV.dim</file>
       <formatName>BEAM-DIMAP</formatName>
     </parameters>
   </node>
@@ -48,9 +37,6 @@
     </node>
     <node id="KMeansClusterAnalysis">
       <displayPosition x="283.0" y="127.0"/>
-    </node>
-    <node id="BandSelect">
-      <displayPosition x="154.0" y="134.0"/>
     </node>
     <node id="Write">
             <displayPosition x="455.0" y="135.0"/>
