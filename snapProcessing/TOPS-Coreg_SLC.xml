@@ -4,14 +4,14 @@
     <operator>Read</operator>
     <sources/>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/Users/GalinaJonat/Documents/IIKT/Thesis/s1_SLC/S1B_IW_SLC__1SDH_20190822T101605_20190822T101633_017697_0214B6_5AF9.zip</file>
+      <file>/home/rus/shared/thesis/SLC_orig/Dec19/S1B_IW_SLC__1SDH_20191126T101606_20191126T101634_019097_0240A6_0FF3.zip</file>
     </parameters>
   </node>
   <node id="Read(2)">
     <operator>Read</operator>
     <sources/>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/Users/GalinaJonat/Documents/IIKT/Thesis/s1_SLC/S1B_IW_SLC__1SDH_20191102T101606_20191102T101634_018747_02355D_ECF7.zip</file>
+      <file>/home/rus/shared/thesis/SLC_orig/Dec19/S1B_IW_SLC__1SDH_20191208T101606_20191208T101634_019272_024630_CABD.zip</file>
     </parameters>
   </node>
   <node id="TOPSAR-Split">
@@ -20,10 +20,10 @@
       <sourceProduct refid="Read"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <subswath>IW1</subswath>
+      <subswath>IW2</subswath>
       <selectedPolarisations>HH</selectedPolarisations>
       <firstBurstIndex>1</firstBurstIndex>
-      <lastBurstIndex>10</lastBurstIndex>
+      <lastBurstIndex>9</lastBurstIndex>
       <wktAoi/>
     </parameters>
   </node>
@@ -33,10 +33,10 @@
       <sourceProduct refid="Read(2)"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <subswath>IW1</subswath>
+      <subswath>IW2</subswath>
       <selectedPolarisations>HH</selectedPolarisations>
       <firstBurstIndex>1</firstBurstIndex>
-      <lastBurstIndex>10</lastBurstIndex>
+      <lastBurstIndex>9</lastBurstIndex>
       <wktAoi/>
     </parameters>
   </node>
@@ -71,8 +71,8 @@
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <demName>External DEM</demName>
       <demResamplingMethod>BICUBIC_INTERPOLATION</demResamplingMethod>
-      <externalDEMFile>/Users/GalinaJonat/Documents/IIKT/Thesis/Datasets/DEM/arcticDEM_10m_v3_2.tif</externalDEMFile>
-      <externalDEMNoDataValue>-9999.0</externalDEMNoDataValue>
+      <externalDEMFile>/home/rus/shared/thesis/DEM/arcticDEM_10m_v3_2.tif</externalDEMFile>
+      <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
       <resamplingType>BISINC_5_POINT_INTERPOLATION</resamplingType>
       <maskOutAreaWithoutElevation>true</maskOutAreaWithoutElevation>
       <outputRangeAzimuthOffset>false</outputRangeAzimuthOffset>
@@ -80,30 +80,13 @@
       <disableReramp>false</disableReramp>
     </parameters>
   </node>
-<!--   <node id="Subset">
-    <operator>Subset</operator>
-    <sources>
-      <sourceProduct refid="Back-Geocoding"/>
-    </sources>
-    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <sourceBands/>
-      <region>0,0,0,0</region>
-      <referenceBand/>
-      <geoRegion>POLYGON ((-55.29999923706055 70.2936019897461, -51.70000076293945 70.2936019897461, -51.70000076293945 69.22410583496094, -55.29999923706055 69.22410583496094, -55.29999923706055 70.2936019897461, -55.29999923706055 70.2936019897461))</geoRegion>
-      <subSamplingX>1</subSamplingX>
-      <subSamplingY>1</subSamplingY>
-      <fullSwath>false</fullSwath>
-      <tiePointGridNames/>
-      <copyMetadata>true</copyMetadata>
-    </parameters>
-  </node> -->
   <node id="Write">
     <operator>Write</operator>
     <sources>
       <sourceProduct refid="Back-Geocoding"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/Users/GalinaJonat/Documents/IIKT/Thesis/processed/Subset_S1B_IW_SLC__1SDH_20190822T101605_20190822T101633_017697_0214B6_5AF9_Orb_Stack.dim</file>
+      <file>/home/rus/shared/thesis/Coherence/Subset_S1B_IW_SLC__1SDH_20191126T101606_20191209T101606_Orb_Stack.dim</file>
       <formatName>BEAM-DIMAP</formatName>
     </parameters>
   </node>
@@ -129,9 +112,6 @@
     </node>
     <node id="Back-Geocoding">
       <displayPosition x="384.0" y="103.0"/>
-    </node>
-    <node id="Subset">
-      <displayPosition x="563.0" y="96.0"/>
     </node>
     <node id="Write">
             <displayPosition x="698.0" y="106.0"/>
