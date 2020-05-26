@@ -1,0 +1,64 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Read">
+    <operator>Read</operator>
+    <sources/>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/home/rus/shared/thesis/Coherence/Interferogram/S1B_IW_SLC__1SDH_20191126T101606_20191209T101606_Orb_Stack_IW2_ifg_deb.dim</file>
+    </parameters>
+  </node>
+  <node id="GoldsteinPhaseFiltering">
+    <operator>GoldsteinPhaseFiltering</operator>
+    <sources>
+      <sourceProduct refid="Multilook"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <alpha>1.0</alpha>
+      <FFTSizeString>64</FFTSizeString>
+      <windowSizeString>3</windowSizeString>
+      <useCoherenceMask>false</useCoherenceMask>
+      <coherenceThreshold>0.2</coherenceThreshold>
+    </parameters>
+  </node>
+  <node id="Multilook">
+    <operator>Multilook</operator>
+    <sources>
+      <sourceProduct refid="Read"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <sourceBands/>
+      <nRgLooks>4</nRgLooks>
+      <nAzLooks>1</nAzLooks>
+      <outputIntensity>false</outputIntensity>
+      <grSquarePixel>true</grSquarePixel>
+    </parameters>
+  </node>
+  <node id="Write">
+    <operator>Write</operator>
+    <sources>
+      <sourceProduct refid="GoldsteinPhaseFiltering"/>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <file>/home/rus/shared/thesis/Coherence/Interferogram/S1B_IW_SLC__1SDH_20191126T101606_20191209T101606_Orb_Stack_IW2_ifg_deb_ML_Flt_TC.dim</file>
+      <formatName>BEAM-DIMAP</formatName>
+    </parameters>
+  </node>
+  <applicationData id="Presentation">
+    <Description/>
+    <node id="Read">
+            <displayPosition x="37.0" y="134.0"/>
+    </node>
+    <node id="GoldsteinPhaseFiltering">
+      <displayPosition x="263.0" y="135.0"/>
+    </node>
+    <node id="Multilook">
+      <displayPosition x="130.0" y="136.0"/>
+    </node>
+    <node id="Terrain-Correction">
+      <displayPosition x="480.0" y="137.0"/>
+    </node>
+    <node id="Write">
+            <displayPosition x="671.0" y="137.0"/>
+    </node>
+  </applicationData>
+</graph>
