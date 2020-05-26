@@ -39,7 +39,7 @@
       <sourceProduct refid="GoldsteinPhaseFiltering"/>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>/home/rus/shared/thesis/Coherence/Interferogram/S1B_IW_SLC__1SDH_20191126T101606_20191209T101606_Orb_Stack_IW2_ifg_deb_ML_Flt_TC.dim</file>
+      <file>/home/rus/shared/thesis/Coherence/Interferogram/S1B_IW_SLC__1SDH_20191126T101606_20191209T101606_Orb_Stack_IW2_ifg_deb_ML_Flt.dim</file>
       <formatName>BEAM-DIMAP</formatName>
     </parameters>
   </node>
