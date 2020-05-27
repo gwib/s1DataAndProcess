@@ -8,7 +8,7 @@
 
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
-gptPath="$snapGPT"
+gptPath="gpt"
 
 ############################################
 # Command line handling
@@ -47,19 +47,29 @@ removeExtension() {
 # Create the target directory
 mkdir -p "${targetDirectory}"
 
-files=($(ls -1d "${sourceDirectory}"/*))
-echo "first file"
-file1="${files[0]}"
-echo "second file"
-file2="${files[1]}"
+echo "----------------------------"
+#files=($(ls -1d "${sourceDirectory}"/*))
+#echo "first file"
+#file1="${files[0]}"
+#echo "second file"
+#file2="${files[1]}"
 echo "---------------"
 
-targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-${gptPath} ${graphXmlPath} -e -t ${targetFile} -Pmaster=${file1} -Pslave=${file2}
+#targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
+#${gptPath} ${graphXmlPath} -e -t ${targetFile} -Pmaster=${file1} -Pslave=${file2}
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
-for F in $(ls -1d "${sourceDirectory}"/S1*.zip); do
-  echo $F
+for F in $(ls -1d "${sourceDirectory}"/*); do
+
+  file1=$(ls -1d "${F}"/*.zip | awk 'NR==1')
+  echo $file1
+  file2=$(ls -1d "${F}"/*.zip | awk 'NR==2')
+  echo $file2
+
+  echo $(basename ${F})
+
+  echo $targetDirectory
   #sourceFile="$(realpath "$F")"
-  #targetFile="${targetDirectory}/${targetFilePrefix}_$(removeExtension "$(basename ${F})").dim"
-  #${gptPath} ${graphXmlPath} -e -t ${targetFile} -Smaster= -sSlave=
+  targetFile="${targetDirectory}/${targetFilePrefix}_"$(basename ${F})".dim"
+  echo $targetFile
+  ${gptPath} ${graphXmlPath} -e -t ${targetFile} -Pmaster=${file1} -Pslave=${file2} -x
 done
