@@ -71,5 +71,10 @@ for F in $(ls -1d "${sourceDirectory}"/*); do
   #sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_"$(basename ${F})".dim"
   echo $targetFile
-  ${gptPath} ${graphXmlPath} -e -t ${targetFile} -Pmaster=${file1} -Pslave=${file2} -x
+  if [ -f "$targetFile" ]; then
+    echo "$targetFile exists, no action needed"
+  else
+    echo "$targetFile does not exist, generating product"
+    ${gptPath} ${graphXmlPath} -e -t ${targetFile} -Pmaster=${file1} -Pslave=${file2} -x
+  fi
 done
