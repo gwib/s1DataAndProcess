@@ -28,8 +28,8 @@
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
       <sourceBands/>
       <demName>External DEM</demName>
-      <externalDEMFile>/home/rus/shared/thesis/DEM/arcticDEM_10m_v3_2.tif</externalDEMFile>
-      <externalDEMNoDataValue>0.0</externalDEMNoDataValue>
+      <externalDEMFile>/Users/GalinaJonat/Documents/IIKT/Thesis/Datasets/DEM/arcticDEM_10m_v3_2.tif</externalDEMFile>
+      <externalDEMNoDataValue>-9999.0</externalDEMNoDataValue>
       <externalDEMApplyEGM>true</externalDEMApplyEGM>
       <demResamplingMethod>BILINEAR_INTERPOLATION</demResamplingMethod>
       <imgResamplingMethod>BILINEAR_INTERPOLATION</imgResamplingMethod>

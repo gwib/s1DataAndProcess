@@ -8,7 +8,8 @@
 
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
-gptPath="gpt"
+#gptPath="gpt"
+gptPath="$snapGPT"
 
 ############################################
 # Command line handling
@@ -36,7 +37,8 @@ targetFilePrefix="$4"
 ############################################
 removeExtension() {
     file="$1"
-    echo "$(echo "$file" | sed -r 's/\.[^\.]*$//')"
+    echo "$(echo "$file" | sed -E 's/\.[^\.]*$//')"   
+    #echo "$(echo "$file" | sed -r 's/\.[^\.]*$//')"
 }
 
 
