@@ -11,7 +11,7 @@
     <operator>Read</operator>
     <sources/>
      <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <file>${master}</file>
+      <file>${slave}</file>
     </parameters>
   </node>
   <node id="TOPSAR-Split">

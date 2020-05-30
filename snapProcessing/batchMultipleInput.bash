@@ -71,6 +71,8 @@ for F in $(ls -1d "${sourceDirectory}"/*); do
   #sourceFile="$(realpath "$F")"
   targetFile="${targetDirectory}/${targetFilePrefix}_"$(basename ${F})".dim"
   echo $targetFile
+  echo $file1
+  echo $file2
   if [ -f "$targetFile" ]; then
     echo "$targetFile exists, no action needed"
   else
