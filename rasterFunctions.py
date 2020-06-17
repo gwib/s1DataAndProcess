@@ -67,6 +67,8 @@ def plotHistogramsForTif(filepath, targetDir=''):
         
         ax1.set_title('HH polarisation')
         ax2.set_title('HV polarisation')
+        
+        fig.suptitle('Histogram for polarisation on '+splitDate, fontsize=14)
     
         ax1.get_shared_x_axes().join(ax1, ax2)
         ax1.set_xticklabels([])
