@@ -1,0 +1,27 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="Interferogram">
+    <operator>Interferogram</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <subtractFlatEarthPhase>true</subtractFlatEarthPhase>
+      <srpPolynomialDegree>5</srpPolynomialDegree>
+      <srpNumberPoints>501</srpNumberPoints>
+      <orbitDegree>3</orbitDegree>
+      <includeCoherence>true</includeCoherence>
+      <cohWinAz>3</cohWinAz>
+      <cohWinRg>10</cohWinRg>
+      <squarePixel>true</squarePixel>
+      <subtractTopographicPhase>true</subtractTopographicPhase>
+      <demName>External DEM</demName>
+       <externalDEMFile>/Users/GalinaJonat/Documents/IIKT/Thesis/Datasets/DEM/arcticDEM_10m_v3_2.tif</externalDEMFile>
+      <externalDEMNoDataValue>-9999.0</externalDEMNoDataValue>
+      <externalDEMApplyEGM>true</externalDEMApplyEGM>
+      <tileExtensionPercent>100</tileExtensionPercent>
+      <outputElevation>false</outputElevation>
+      <outputLatLon>false</outputLatLon>
+    </parameters>
+  </node>
+</graph>
