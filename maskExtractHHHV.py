@@ -59,7 +59,7 @@ def readFcc(fPath=fccPath):
     print(splitDate)
     
     fcc = rio.open(fPath)
-    fcc.meta # print metadata
+    print(fcc.meta) # print metadata
     
     fcc_hh = fcc.read(1)
     fcc_hv = fcc.read(2)
@@ -69,7 +69,11 @@ def readFcc(fPath=fccPath):
     
     plotPols(fcc_hh, fcc_hv, splitDate)
     
+    printMinMax(fcc_hh, fcc_hv)
+    
     return fcc_hh, fcc_hv
+
+
 
 
 
@@ -87,6 +91,16 @@ def plotPols(hh, hv, date):
     axs[0].set_title('HH band')
     axs[1].set_title('HV band')
     fig.suptitle('Radiometrically calibrated backscatter from: '+date, fontsize=14)
+    
+    
+def printMinMax(hh, hv):
+    hh = hh[~np.isnan(hh)]
+    hv = hv[~np.isnan(hv)]
+
+    print ('HH min: '+ str(hh.min()))
+    print ('HH max: '+ str(hh.max()))
+    print ('HV min: '+ str(hv.min()))
+    print ('HV max: '+ str(hv.max()))
 
 ###### HELPER FUNCTIONS #####
 # extracting date from filename
