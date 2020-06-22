@@ -17,7 +17,7 @@ fccPath = '/Volumes/ElementsSE/thesisData/FCCbatch_clipped/FCC_Sigma0_HHHV_20190
 # directory containing clipped tifs
 directory = r'/Volumes/ElementsSE/thesisData/FCCbatch_clipped'
 
-def readSnwPrbMask(fp = mskFile, threshold=60):
+def readSnwPrbMask(fp = mskFile, threshold=80):
     # import and create binary snow mask
     snwPrbMask=rio.open(fp)
     snwPrbMask.meta
@@ -55,9 +55,9 @@ def readSnwPrbMask(fp = mskFile, threshold=60):
 # next up --> extract bands from FCC to dict
 # read all files from directory
 
-def meanSdForTif(direc=directory):
+def meanSdForTif(direc=directory,t=98):
     # read boolean snow mask
-    _, snwBool = readSnwPrbMask()
+    _, snwBool = readSnwPrbMask(threshold=t) # modify threshold
     hhMeanDict = {}
     hhSdDict = {}
     hvMeanDict = {}
@@ -84,13 +84,13 @@ def meanSdForTif(direc=directory):
         # calculate mean and sd for glacierised areas
         hhMean = hh_msk_val.mean()
         hhSd = hh_msk_val.std()
-        print('Mean HH: ' + str(hhMean))
-        print('Standard dev HH: ' + str(hhSd))
+        #print('Mean HH: ' + str(hhMean))
+        #print('Standard dev HH: ' + str(hhSd))
             
         hvMean = hv_msk_val.mean()
         hvSd = hv_msk_val.std()
-        print('Mean HH: ' + str(hvMean))
-        print('Standard dev HH: ' + str(hvSd))
+        #print('Mean HV: ' + str(hvMean))
+        #print('Standard dev HV: ' + str(hvSd))
         
         hhMeanDict[splitDate] = hhMean
         hhSdDict[splitDate] = hhSd
@@ -106,10 +106,10 @@ def meanSdForTif(direc=directory):
 def readFcc(fPath=fccPath):
     
     splitDate = dateFromFilename(os.path.split(fPath)[-1])
-    print(splitDate)
+    #print(splitDate)
     
     fcc = rio.open(fPath)
-    print(fcc.meta) # print metadata
+    #print(fcc.meta) # print metadata
     
     fcc_hh = fcc.read(1)
     fcc_hv = fcc.read(2)
@@ -119,14 +119,14 @@ def readFcc(fPath=fccPath):
     
     #plotPols(fcc_hh, fcc_hv, splitDate)
     
-    printMinMax(fcc_hh, fcc_hv)
+    #printMinMax(fcc_hh, fcc_hv)
     
     return fcc_hh, fcc_hv
 
 
 
 
-
+####### PLOTS ######
 def plotPols(hh, hv, date):
     
     # normalizing colormap to constant boundaries
@@ -142,7 +142,61 @@ def plotPols(hh, hv, date):
     axs[1].set_title('HV band')
     fig.suptitle('Radiometrically calibrated backscatter from: '+date, fontsize=14)
     
+def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict):
+    # Create a figure with customized size
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111)
     
+    # Set the axis lables
+    ax.set_xlabel('Day', fontsize = 18)
+    ax.set_ylabel('Temperature', fontsize = 18)
+    
+    # X axis is day numbers from 1 to 15
+    xaxis = np.array(range(1,16))
+    
+    # Line color for error bar
+    color_City_A = 'red'
+    color_City_B = 'darkgreen'
+    
+    # Line style for each dataset
+    lineStyle_City_A={"linestyle":"--", "linewidth":2, "markeredgewidth":2, "elinewidth":2, "capsize":3}
+    lineStyle_City_B={"linestyle":"-", "linewidth":2, "markeredgewidth":2, "elinewidth":2, "capsize":3}
+    
+    # Create an error bar for each dataset
+    line_City_A=ax.errorbar(xaxis, City_A, yerr=STDV_City_A, **lineStyle_City_A, color=color_City_A, label='City A')
+    line_City_B=ax.errorbar(xaxis, City_B, yerr=STDV_City_B, **lineStyle_City_B, color=color_City_B, label='City B')
+    
+    # Label each dataset on the graph, xytext is the label's position 
+    for i, txt in enumerate(City_A):
+            ax.annotate(txt, xy=(xaxis[i], City_A[i]), xytext=(xaxis[i]+0.03, City_A[i]+0.3),color=color_City_A)
+    
+    for i, txt in enumerate(City_B):
+            ax.annotate(txt, xy=(xaxis[i], City_B[i]), xytext=(xaxis[i]+0.03, City_B[i]+0.3),color=color_City_B)
+            
+    
+    # Draw a legend bar
+    plt.legend(handles=[line_City_A, line_City_B], loc='upper right')
+    
+    # Customize the tickes on the graph
+    plt.xticks(xaxis)               
+    plt.yticks(np.arange(20, 47, 2))
+    
+    # Customize the legend font and handle length
+    params = {'legend.fontsize': 13,
+              'legend.handlelength': 2}
+    plt.rcParams.update(params)
+
+    
+    # Draw a grid for the graph
+    ax.grid(color='lightgrey', linestyle='-')
+    ax.set_facecolor('w')
+    
+    plt.show()
+    return np.nan
+
+
+
+###### HELPER FUNCTIONS #####
 def printMinMax(hh, hv):
     hh = hh[~np.isnan(hh)]
     hv = hv[~np.isnan(hv)]
@@ -152,8 +206,6 @@ def printMinMax(hh, hv):
     print ('HV min: '+ str(hv.min()))
     print ('HV max: '+ str(hv.max()))
 
-
-###### HELPER FUNCTIONS #####
 def extractVals(a):
     a_Val = a[(~np.isnan(a)) & (a !=0)] # extract values that are neither nan or zero
     return a_Val
