@@ -16,7 +16,7 @@ def saveObj(pklFile=fn, *argv):
         pickle.dump([*argv], f)
 
 # Getting back the objects:
-def readHHHVdicts():
-    with open(fn, 'rb') as f:
+def readHHHVdicts(fp=fn):
+    with open(fp, 'rb') as f:
         mHH, sHH, mHV, sHV = pickle.load(f)
     return mHH, sHH, mHV, sHV

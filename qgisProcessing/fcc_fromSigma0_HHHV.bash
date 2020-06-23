@@ -39,7 +39,7 @@ removeExtension() {
 mkdir -p "${targetDirectory}"
 
 # the d option limits the elemeents to loop over to directories. Remove it, if you want to use files.
-for F in $(ls -1d "${sourceDirectory}"/WinsvoldGRD*.data); do #TODO: change filename and extension
+for F in $(ls -1d "${sourceDirectory}"/Sigma0_*.data); do #TODO: change filename and extension
   hhFile="$(realpath "$F")/Sigma0_HH_db.img"
   hvFile="$(realpath "$F")/Sigma0_HV_db.img"
   targetFile="${targetDirectory}/$(removeExtension "$(basename ${F})").tif"
@@ -47,5 +47,6 @@ for F in $(ls -1d "${sourceDirectory}"/WinsvoldGRD*.data); do #TODO: change file
   echo "HH: $hhFile"
   echo "HV: $hvFile"
   echo "Target: $targetFile"
+  gdal_merge.py -separate -ot Float32 -of GTiff -o ${targetFile} ${hhFile} ${hvFile}
   #${gptPath} ${graphXmlPath} -e -t ${targetFile} ${sourceFile} -x
 done
