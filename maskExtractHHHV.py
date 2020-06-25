@@ -9,6 +9,7 @@ import rasterio as rio
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from colours import cMap
 
 ### predefined vars
 mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
@@ -53,9 +54,9 @@ def readSnwPrbMask(fp = mskFile, threshold=80):
 # next up --> extract bands from FCC to dict
 # read all files from directory
 
-def meanSdForTif(direc=directory,t=95):
+def meanSdForTif(direc=directory,t=95,msk=mskFile):
     # read boolean snow mask
-    _, snwBool = readSnwPrbMask(threshold=t) # modify threshold
+    _, snwBool = readSnwPrbMask(msk,threshold=t) # modify threshold
     hhMeanDict = {}
     hhSdDict = {}
     hvMeanDict = {}
@@ -109,7 +110,7 @@ def meanSdForTif(direc=directory,t=95):
         hvMeanDict[splitDate] = hvMean
         hvSdDict[splitDate] = hvSd
         
-        plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict)
+    plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict)
     
     return hhMeanDict, hhSdDict, hvMeanDict, hvSdDict
             
@@ -195,8 +196,6 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
         HVmean_y.append(hvMeanDict[d])
         HHsd.append(hhSdDict[d])
         HVsd.append(hvSdDict[d])
-        
-    
     
     # Line color for error bar
     color_HH = 'orange'
@@ -241,7 +240,19 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     if len(saveFile) > 0:
         plt.savefig(saveFile)
 
-
+def plotMeans(hhMeanDict, hvMeanDict):
+    hh = []
+    hv =  [] 
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    for d in dates:
+        hh.append(hhMeanDict[d])
+        hv.append(hvMeanDict[d])
+        
+    plt.scatter(hh,hv)
+    plt.xlabel('HH')
+    plt.ylabel('HV')
+    plt.show()
 
 ###### HELPER FUNCTIONS #####
 def printMinMax(hh, hv):

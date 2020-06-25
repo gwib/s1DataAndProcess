@@ -14,6 +14,7 @@ import numpy as np
 import re
 import os
 from pathlib import Path
+from colours import cMap
 
 
 #filepath = '/Volumes/ElementsSE/thesisData/FCCbatch/FCC_Sigma0_HHHV_20190412.tif'
@@ -37,7 +38,7 @@ def removeNansFromArray(inArray):
     return outArray
 
 def dateFromFilename(fn):
-    s1 = fn.split('_')[-1]
+    s1 = fn.split('_')[-2]
     s2 = s1.split('.')[0]
     return s2
 
@@ -76,4 +77,6 @@ def plotHistogramsForTif(filepath, targetDir=''):
         
     plt.show()
     Path(targetDir).mkdir(parents=True, exist_ok=True)
+    
+    
     plt.savefig(figName)
