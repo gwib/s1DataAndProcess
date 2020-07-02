@@ -13,8 +13,8 @@ blue = Color('#00338D')
 azure = Color('#0098DB')
 green = Color('#008542')
 orange = Color('#E37222')
-red = Color('#D0103A')
-yellow = Color('#FDC82F')
+read = Color('#D0103A')
+yelow = Color('#FDC82F')
 
 colorList = ['#00338D','#0098DB','#008542','#E37222','#D0103A','#FDC82F']
 cMap = matplotlib.colors.ListedColormap(colorList)

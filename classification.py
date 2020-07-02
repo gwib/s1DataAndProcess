@@ -17,47 +17,25 @@ from sklearn.metrics import silhouette_score
 from matplotlib import colors as mcolors
 from colours import cMap # thesis colour scheme
 import xarray as xr
-
- ###HELPER FUNCTIONS###
-# =============================================================================
-# def readFcc(fPath):
-#     
-#     #splitDate = dateFromFilename(os.path.split(fPath)[-1])
-#     #print(splitDate)
-#     
-#     fcc = rio.open(fPath)
-#     #print(fcc.meta) # print metadata
-#     
-#     fcc_hh = fcc.read(1)
-#     
-#     try: fcc_hv = fcc.read(2)
-#     except: fcc_hv = np.nan
-#     
-#     fcc_hh[fcc_hh == 0] = np.nan
-#     try: fcc_hv[fcc_hv == 0] = np.nan
-#     except: print('HV not available.')
-#     
-#     #plotPols(fcc_hh, fcc_hv, splitDate)
-#     
-#     #printMinMax(fcc_hh, fcc_hv)
-#     
-#     return fcc_hh, fcc_hv, fcc   
-# ######    
-# =============================================================================
+import random
 
 
+# example file
 fp = '/Volumes/ElementsSE/thesisData/toHist/ncdf/Sigma0_HHHV_20190611.nc'
 
+# putting it all together
 def kmeansFromNetCDF(fPath):
     outFname = os.path.dirname(fPath)+'/'+os.path.split(fp)[-1].split('.')[-2]+'_clusters.csv'
     
     df = readDfFromNetCDF(fPath)
     print(df.head())
-    print('Starting kMeans. Output file will be saved in: '+outFname )    
+    #print(df.shape)
+    print('Starting kMeans. ')    
     df, kmeans = kmeansOnHHHV(df,outFname)
     
     return df, kmeans
 
+# reading dataframe from netCDF file
 def readDfFromNetCDF(fPath):
     ds = xr.open_dataset(fPath)
     df = ds.to_dataframe()
@@ -65,14 +43,25 @@ def readDfFromNetCDF(fPath):
     df.replace(0,np.nan,inplace=True)
     return df
 
+# K-Means clustering with both polarisations
 def kmeansOnHHHV(df, outFile='/Volumes/ElementsSE/thesisData/toHist/clustering/clusters.csv'):
+    print(df.shape)
+    df.dropna(inplace=True)
+    print('NaNs removed.')
+    print(df.shape)
     #perform kmeans
     kmeans = KMeans(n_clusters=6, random_state=3).fit(df[['Band1', 'Band2']])
     
     # new column in dataframe for location cluster
     df['kmeans_cluster'] = kmeans.labels_
     
-    try: df.to_csv(outFile)
+    print ('Cluster Centers: ')
+    print (kmeans.cluster_centers_)
+    
+    try:
+        df.to_csv(outFile)
+        print('Output file has been saved: '+outFile)
+    except: print('CSV file could not be saved.')
     # computing and printing the score of the clustering
     try: print('------Scores of K-Mean Clustering on dataframe ----------\n'+'silhouette:'+str(kmeansSilhouette(df))+
           '\n'+'distortion: '+str(kmeans.inertia_))
@@ -81,6 +70,7 @@ def kmeansOnHHHV(df, outFile='/Volumes/ElementsSE/thesisData/toHist/clustering/c
     return df, kmeans # returns df with added column from clustering
 
 def kmeansOnHH(df):
+    df.dropna(inplace=True)
     #perform kmeans
     kmeans = KMeans(n_clusters=6, random_state=3).fit(df[['Band1']]) #HH
     
@@ -115,12 +105,18 @@ def kmeansSilhouette(df):
     silhouette_avg = silhouette_score(pwdist, sampledf['kmeans_cluster'], metric="precomputed")
     return silhouette_avg
 
+
+def saveDataframeToNetCDF(df, outFile):
+    ds = df.set_index(['x','y']).to_xarray()
+    ds.to_netcdf(outFile)
+
 def plotClusters(df, clusterCol='kmeans_cluster'):
-    num_colors=len(set(df[clusterCol].values))
-    #colors=list(mcolors.CSS4_COLORS.keys())  #found this by searching "python color list"
-    #cluster_colors=random.choices(cMap, k=num_colors)
+    num_colors=6
+    #num_colors=len(set(df[clusterCol].values))
+    colors=list(mcolors.CSS4_COLORS.keys())  #found this by searching "python color list"
+    cluster_colors=random.choices(colors, k=num_colors)
     for i in range(0, num_colors):
-        print('Color for cluster '+str(i)+': '+ cMap[i])
+        print('Color for cluster '+str(i)+': '+ cluster_colors[i])
     x_=[]
     y_=[]
     c_=[]
@@ -129,7 +125,6 @@ def plotClusters(df, clusterCol='kmeans_cluster'):
             continue
         x_.append(x)
         y_.append(y)
-        c_.append(cMap[label])
+        c_.append(cluster_colors[label])
     plt.scatter(x_,y_,s=0.3,c=c_)
     #plt.scatter(-73.974689,40.68265, c='black')
-    

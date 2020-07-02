@@ -9,7 +9,8 @@ import rasterio as rio
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from colours import cMap
+from colours import colorList, cMap
+from colour import Color
 
 ### predefined vars
 mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
@@ -177,7 +178,7 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     ax = fig.add_subplot(111)
     
     # Set the axis lables
-    ax.set_xlabel('Day', fontsize = 14)
+    ax.set_xlabel('Date', fontsize = 14)
     ax.set_ylabel('Mean sigma_0 [dB]', fontsize = 14)
     
     # X axis is day numbers from 1 to 15
@@ -198,8 +199,8 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
         HVsd.append(hvSdDict[d])
     
     # Line color for error bar
-    color_HH = 'orange'
-    color_HV = 'darkgreen'
+    color_HH = '#E37222' # orange
+    color_HV = '#008542' # green
     
     # Line style for each dataset
     lineStyle_HH={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
