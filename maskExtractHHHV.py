@@ -255,6 +255,19 @@ def plotMeans(hhMeanDict, hvMeanDict):
     plt.ylabel('HV')
     plt.show()
 
+def plotMeanDiff(hhMeanDict, hvMeanDict):
+    hh = []
+    hv = []
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    for d in dates:
+        hh.append(hhMeanDict[d])
+        hv.append(hvMeanDict[d])
+    hhMinusHv = [a_i - b_i for a_i, b_i in zip(hh, hv)]
+    plt.plot(dates, hhMinusHv)
+    plt.xlabel('Date')
+    plt.ylabel('HH/HV')
+    
 ###### HELPER FUNCTIONS #####
 def printMinMax(hh, hv):
     hh = hh[~np.isnan(hh)]
