@@ -9,8 +9,8 @@
 # adapt this path to your needs
 #export PATH=~/progs/snap/bin:$PATH
 #gptPath="gpt"
-gptPath="$snapGPT"
-
+#gptPath="$snapGPT"
+gptPath="C:\Program Files\snap\bin\gpt"
 ############################################
 # Command line handling
 ############################################
