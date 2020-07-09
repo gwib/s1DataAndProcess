@@ -6,10 +6,10 @@
       <sourceProduct>${sourceProduct}</sourceProduct>
     </sources>
     <parameters class="com.bc.ceres.binding.dom.XppDomElement">
-      <clusterCount>8</clusterCount>
+      <clusterCount>6</clusterCount>
       <iterationCount>30</iterationCount>
       <randomSeed>31415</randomSeed>
-      <sourceBandNames/>
+      <sourceBandNames>band_1,band_2</sourceBandNames>
       <roiMaskName/>
     </parameters>
   </node>

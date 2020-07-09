@@ -11,15 +11,18 @@ import matplotlib.pyplot as plt
 import os
 from colours import colorList, cMap
 from colour import Color
+import fnmatch
+import datetime as dt
 
 ### predefined vars
-mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
+#mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
+mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/s2mskAligned_new_12600.tif'
 #for testing purposes
 fccPath = '/Volumes/ElementsSE/thesisData/FCCbatch_clipped/FCC_Sigma0_HHHV_20190412_clipped.tif'
 # directory containing clipped tifs
 directory = r'/Volumes/ElementsSE/thesisData/FCCbatch_clipped'
 
-def readSnwPrbMask(fp = mskFile, threshold=80):
+def readSnwPrbMask(fp = mskFile, threshold=60):
     # import and create binary snow mask
     snwPrbMask=rio.open(fp)
     snwPrbMask.meta
@@ -55,9 +58,10 @@ def readSnwPrbMask(fp = mskFile, threshold=80):
 # next up --> extract bands from FCC to dict
 # read all files from directory
 
-def meanSdForTif(direc=directory,t=95,msk=mskFile):
+def meanSdForTif(direc=directory,msk=mskFile):
     # read boolean snow mask
-    _, snwBool = readSnwPrbMask(msk,threshold=t) # modify threshold
+    _, snwBool = readSnwPrbMask(msk) # modify threshold
+    print (snwBool.shape)
     hhMeanDict = {}
     hhSdDict = {}
     hvMeanDict = {}
@@ -69,13 +73,15 @@ def meanSdForTif(direc=directory,t=95,msk=mskFile):
             p = entry.path
         else: continue
         
-        if entry.path.endswith('_clipped.tif'):
-            splitDate = dateFromFilename(os.path.split(p)[-1], 2)
-        else: 
-            splitDate = dateFromFilename(os.path.split(p)[-1])
-        print(splitDate)
-        hh, hv = readFcc(p) # original hh and hv with nan values
         
+        splitDate = dateFromFilename(os.path.split(p)[-1], 2)
+        #print(splitDate)
+        
+        date = splitDate.date()
+        print(date)
+        
+        hh, hv = readFcc(p) # original hh and hv with nan values
+        print (hh.shape)
         hhMean, hhSd = calcMeanSd(snwBool, hh)
         
         try:
@@ -105,11 +111,11 @@ def meanSdForTif(direc=directory,t=95,msk=mskFile):
 #         #print('Standard dev HV: ' + str(hvSd))
 # =============================================================================
         
-        hhMeanDict[splitDate] = hhMean
-        hhSdDict[splitDate] = hhSd
+        hhMeanDict[date] = hhMean
+        hhSdDict[date] = hhSd
             
-        hvMeanDict[splitDate] = hvMean
-        hvSdDict[splitDate] = hvSd
+        hvMeanDict[date] = hvMean
+        hvSdDict[date] = hvSd
         
     plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict)
     
@@ -284,9 +290,11 @@ def extractVals(a):
 
 # extracting date from filename
 def dateFromFilename(fn,dloc=1):
-    s1 = fn.split('_')[-dloc]
-    #s2 = s1.split('.')[0]
-    return s1
+    #s1 = os.path.split(fn)[-1]
+    s_tuple = fn.split('_')
+    d_str = fnmatch.filter(s_tuple, '20*')[0]
+    d_dt = dt.datetime.strptime(d_str, '%Y%m%d')
+    return d_dt
 
 
 # define binary colormap

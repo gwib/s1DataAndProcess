@@ -1,0 +1,16 @@
+<graph id="Graph">
+  <version>1.0</version>
+  <node id="KMeansClusterAnalysis">
+    <operator>KMeansClusterAnalysis</operator>
+    <sources>
+      <sourceProduct>${sourceProduct}</sourceProduct>
+    </sources>
+    <parameters class="com.bc.ceres.binding.dom.XppDomElement">
+      <clusterCount>7</clusterCount>
+      <iterationCount>50</iterationCount>
+      <randomSeed>31415</randomSeed>
+      <sourceBandNames>band_1,band_2</sourceBandNames>
+      <roiMaskName/>
+    </parameters>
+  </node>
+</graph>

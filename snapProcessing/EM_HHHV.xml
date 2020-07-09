@@ -1,0 +1,17 @@
+<graph id="EM7Clusters">
+  <version>1.0</version>
+  <node id="EMClusterAnalysis">
+    <operator>EMClusterAnalysis</operator>
+    <sources>
+      <source>${sourceProduct}</source>
+    </sources>
+    <parameters>
+      <clusterCount>7</clusterCount>
+      <iterationCount>50</iterationCount>
+      <randomSeed>31415</randomSeed>
+      <sourceBandNames>band_1,band_2</sourceBandNames>
+      <roiMaskName/>
+      <includeProbabilityBands>true</includeProbabilityBands>
+    </parameters>
+  </node>
+</graph>

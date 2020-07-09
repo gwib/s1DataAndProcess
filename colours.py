@@ -14,7 +14,15 @@ azure = Color('#0098DB')
 green = Color('#008542')
 orange = Color('#E37222')
 read = Color('#D0103A')
-yelow = Color('#FDC82F')
+yellow = Color('#FDC82F')
+
+secondary = {}
+secondary['darkblue'] = '#002664'
+secondary['darkAzure'] = '#00549f'
+secondary['darkGreen'] = '#284e36'
+secondary['darkOrange'] = '#9d5116'
+secondary['darkRed'] = '#B22433'
+secondary['darkYellow'] = '#b88b00'
 
 colorList = ['#00338D','#0098DB','#008542','#E37222','#D0103A','#FDC82F']
-cMap = matplotlib.colors.ListedColormap(colorList)
+cMap = matplotlib.colors.LinearSegmentedColormap.from_list("", colorList)

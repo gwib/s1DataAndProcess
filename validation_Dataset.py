@@ -11,7 +11,7 @@ Created on Mon Jun 29 16:30:21 2020
 import pandas as pd
 import numpy as np
 import datetime as dt
-
+import matplotlib.pyplot as plt
 
 glims = pd.read_csv('/Volumes/ElementsSE/thesisData/validation/glims/glimsPolygons_clipped.csv')
 
@@ -43,3 +43,8 @@ glimsSub = pd.read_csv('/Volumes/ElementsSE/thesisData/validation/glims/glims_su
 glimsSub_short = glimsSub.drop(['local_id', 'glac_stat', 'subm_id', 'rc_id'], axis=1)
 
 
+figGlimsHist, axGlimsHist = plt.subplots(dpi=150) 
+axGlimsHist.hist(glims.area, bins=10, color='#0098DB')
+axGlimsHist.set_xlabel('Glacier Count')
+axGlimsHist.set_ylabel(r'Glacier Area in $m^2$')
+plt.show()
