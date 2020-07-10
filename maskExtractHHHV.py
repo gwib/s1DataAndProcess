@@ -9,11 +9,11 @@ import rasterio as rio
 import numpy as np
 import matplotlib.pyplot as plt
 import os
-from colours import colorList, cMap
-from colour import Color
+#from colours import colorList, cMap
+#from colour import Color
 import fnmatch
 import datetime as dt
-
+from colours import colorDict
 ### predefined vars
 #mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
 mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/s2mskAligned_new_12600.tif'
@@ -184,8 +184,8 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     ax = fig.add_subplot(111)
     
     # Set the axis lables
-    ax.set_xlabel('Date', fontsize = 14)
-    ax.set_ylabel('Mean sigma_0 [dB]', fontsize = 14)
+    #ax.set_xlabel('Date',fontsize=14)
+    ax.set_ylabel(r'Mean $\sigma_0$ in $dB$',fontsize=14)
     
     # X axis is day numbers from 1 to 15
     dates = list(hhMeanDict.keys())
@@ -205,8 +205,8 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
         HVsd.append(hvSdDict[d])
     
     # Line color for error bar
-    color_HH = '#E37222' # orange
-    color_HV = '#008542' # green
+    color_HH = colorDict['orange'] # orange
+    color_HV = colorDict['green'] # green
     
     # Line style for each dataset
     lineStyle_HH={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
@@ -228,7 +228,8 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     plt.legend(handles=[line_HH, line_HV], loc='upper right')
     
     # Customize the tickes on the graph
-    plt.xticks(xaxis,rotation=45, fontsize=10)               
+    plt.xticks(xaxis,rotation=45)           
+    plt.xlabel('Date',fontsize=14)    
     #plt.yticks(np.arange(20, 47, 2))
     
     # Customize the legend font and handle length
@@ -238,10 +239,9 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
 
     
     # Draw a grid for the graph
-    ax.grid(color='lightgrey', linestyle='-')
-    ax.set_facecolor('w')
     
-    ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
+    
+    #ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
     
     plt.show()
     if len(saveFile) > 0:
@@ -270,9 +270,15 @@ def plotMeanDiff(hhMeanDict, hvMeanDict):
         hh.append(hhMeanDict[d])
         hv.append(hvMeanDict[d])
     hhMinusHv = [a_i - b_i for a_i, b_i in zip(hh, hv)]
-    plt.plot(dates, hhMinusHv)
-    plt.xlabel('Date')
-    plt.ylabel('HH/HV')
+    plt.plot(dates, hhMinusHv, color=colorDict['yellow'])
+    plt.grid(color=colorDict['black15'])
+    plt.xticks(dates,rotation=45)
+    plt.ylabel(r'HH [$dB$] - HV [$dB$]', fontsize=14)
+    plt.ylim(bottom=6,top=10.5)
+    #plt.dpi(150)
+    #plt.xlabel('Date')
+    #plt.autofmt_xdate(bottom=0.2)
+    
     
 ###### HELPER FUNCTIONS #####
 def printMinMax(hh, hv):

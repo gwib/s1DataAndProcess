@@ -15,6 +15,8 @@ import re
 import os
 from pathlib import Path
 from colours import cMap
+import fnmatch
+import datetime as dt
 
 
 #filepath = '/Volumes/ElementsSE/thesisData/FCCbatch/FCC_Sigma0_HHHV_20190412.tif'
@@ -35,12 +37,23 @@ def readBands(filepath):
 def removeNansFromArray(inArray):
     outArray = inArray.copy()
     outArray[outArray == 0] = np.nan
+    outArray[outArray < -999] = np.nan
     return outArray
 
-def dateFromFilename(fn):
-    s1 = fn.split('_')[-2]
-    s2 = s1.split('.')[0]
-    return s2
+# extracting date from filename
+def dateFromFilename(fn,dloc=1):
+    #s1 = os.path.split(fn)[-1]
+    s_tuple = fn.split('_')
+    d_str = fnmatch.filter(s_tuple, '20*')[0]
+    d_dt = dt.datetime.strptime(d_str, '%Y%m%d')
+    return d_dt
+
+# =============================================================================
+# def dateFromFilename(fn):
+#     s1 = fn.split('_')[-2]
+#     s2 = s1.split('.')[0]
+#     return s2
+# =============================================================================
 
 def plotHistogramsForTif(filepath, targetDir=''):
     
@@ -49,7 +62,7 @@ def plotHistogramsForTif(filepath, targetDir=''):
     
     splitDate = dateFromFilename(os.path.split(filepath)[-1])
     print(splitDate)
-    figName = targetDir+'hist_'+splitDate[3]+'.png'
+    figName = targetDir+'hist_'+str(splitDate.date())+'.png'
     
     HH, HV = readBands(filepath)
     
@@ -69,7 +82,7 @@ def plotHistogramsForTif(filepath, targetDir=''):
         ax1.set_title('HH polarisation')
         ax2.set_title('HV polarisation')
         
-        fig.suptitle('Histogram for polarisation on '+splitDate, fontsize=14)
+        fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
     
         ax1.get_shared_x_axes().join(ax1, ax2)
         ax1.set_xticklabels([])
