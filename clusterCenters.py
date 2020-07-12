@@ -61,3 +61,69 @@ hhhvbyClusters_hh = clustersInCols(clusterHHHV_df,'HH')
 hhhvbyClusters_hv = clustersInCols(clusterHHHV_df, 'HV')
 
 hhhvbyClusters = pd.merge(hhhvbyClusters_hv, hhhvbyClusters_hh, on='Date')
+
+def plotPolPrCluster(dfHH,dfHV):
+    fig = plt.figure(figsize=(10, 8))
+    ax = fig.add_subplot(111)
+    
+    # Set the axis lables
+    #ax.set_xlabel('Date',fontsize=14)
+    ax.set_ylabel(r'Mean $\sigma_0$ in $dB$',fontsize=14)
+    
+    # X axis is day numbers from 1 to 15
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    #print(dates)
+    xaxis = dates
+    
+    # Y values
+    HHc_y = []
+    HVc_y = []
+    #HHsd = []
+    #HVsd = []
+    for d in dates:
+        HHmean_y.append(hhMeanDict[d])
+        HVmean_y.append(hvMeanDict[d])
+        #HHsd.append(hhSdDict[d])
+        #HVsd.append(hvSdDict[d])
+    
+    # Line color for error bar
+    color_HH = colorDict['orange'] # orange
+    color_HV = colorDict['green'] # green
+    
+    # Line style for each dataset
+    lineStyle_HH={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
+    lineStyle_HV={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
+    
+    # Create an error bar for each dataset
+    line_HH=ax.errorbar(xaxis, HHmean_y, yerr=HHsd, **lineStyle_HH, color=color_HH, label='HH')
+    line_HV=ax.errorbar(xaxis, HVmean_y, yerr=HVsd, **lineStyle_HV, color=color_HV, label='HV')
+    
+    # Label each dataset on the graph, xytext is the label's position 
+    #for i, txt in enumerate(HHmean_y):
+    #        ax.annotate(txt, xy=(xaxis[i], HHmean_y[i]), xytext=(xaxis[i]+0.03, HHmean_y[i]+0.3),color=color_HH)
+    
+    #for i, txt in enumerate(HVmean_y):
+    #        ax.annotate(txt, xy=(xaxis[i], HVmean_y[i]), xytext=(xaxis[i]+0.03, HVmean_y[i]+0.3),color=color_HV)
+            
+    
+    # Draw a legend bar
+    plt.legend(handles=[line_HH, line_HV], loc='upper right')
+    
+    # Customize the tickes on the graph
+    plt.xticks(xaxis,rotation=45)           
+    plt.xlabel('Date',fontsize=14)    
+    #plt.yticks(np.arange(20, 47, 2))
+    
+    # Customize the legend font and handle length
+    params = {'legend.fontsize': 12,
+              'legend.handlelength': 2}
+    plt.rcParams.update(params)
+
+    
+    # Draw a grid for the graph
+    
+    
+    #ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
+    
+    plt.show()
