@@ -110,7 +110,7 @@ def meanSdForTif(direc=directory,msk=mskFile):
 #         #print('Mean HV: ' + str(hvMean))
 #         #print('Standard dev HV: ' + str(hvSd))
 # =============================================================================
-        
+         
         hhMeanDict[date] = hhMean
         hhSdDict[date] = hhSd
             

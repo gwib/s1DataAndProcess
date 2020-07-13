@@ -14,7 +14,7 @@ import numpy as np
 import re
 import os
 from pathlib import Path
-from colours import cMap
+from colours import cMap,colorDict
 import fnmatch
 import datetime as dt
 
@@ -62,34 +62,52 @@ def plotHistogramsForTif(filepath, targetDir=''):
     
     splitDate = dateFromFilename(os.path.split(filepath)[-1])
     print(splitDate)
-    figName = targetDir+'hist_'+str(splitDate.date())+'.png'
-    
+    figName = targetDir+'hist_'+str(splitDate.date())+'.pdf'
+    print(figName)
     HH, HV = readBands(filepath)
+    # flatten tif values, such that histogram can be in one colour
+
+    HH_flat = HH.flatten()
+    HV_flat = HV.flatten()
     
     if np.isnan(HV).all():
         raise Exception('HV band of file '+filepath+' is empty! \n Plotting histogram for HH band only')
-        plt.hist(HH)
-        plt.title('HH reflection histogram for the entire image')
+        plt.hist(HH_flat,color=colorDict['green'])
+        plt.ylabel('Pixel Count')
+        plt.xlabel('HH backscatter ([$\sigma_0$]==dB)')
+        #plt.title('HH reflection histogram for the entire image')
     else:
         # subplot with shared x-axis
-        fig=plt.figure()
-        ax1 = plt.subplot(211)
-        ax2 = plt.subplot(212)
+        fig=plt.figure(dpi=200)
+        ax1, ax2 = fig.subplots(2)
+        #ax1 = fig.subplot(211)
+        #ax2 = fig.subplot(212)
         
-        ax1.hist(HH)
-        ax2.hist(HV)
+        ax1.hist(HH_flat,color=colorDict['green'], bins=12)
+        ax2.hist(HV_flat,color=colorDict['orange'], bins=12)
         
-        ax1.set_title('HH polarisation')
-        ax2.set_title('HV polarisation')
+        ax1.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
+        ax2.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
+        ax1.set_ylabel('Pixel Count')
+        ax2.set_ylabel('Pixel Count')
+        #fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
         
-        fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
-    
         ax1.get_shared_x_axes().join(ax1, ax2)
-        ax1.set_xticklabels([])
+        #ax1.set_xticklabels([])
         # ax2.autoscale() ## call autoscale if needed
-        
+    
+    fig.subplots_adjust(hspace=0.42, bottom=0.15)
     plt.show()
     Path(targetDir).mkdir(parents=True, exist_ok=True)
     
     
     plt.savefig(figName)
+    
+def histForPols(inFolder,histFolder):
+    for f in os.listdir(inFolder):
+        if f.endswith('.tif'):
+            plotHistogramsForTif(inFolder+'/'+f,histFolder)
+
+
+#TODO:
+    # histogram between HH/HV ratio
