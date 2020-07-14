@@ -43,7 +43,9 @@ def removeNansFromArray(inArray):
 # extracting date from filename
 def dateFromFilename(fn,dloc=1):
     #s1 = os.path.split(fn)[-1]
+    print(fn)
     s_tuple = fn.split('_')
+    print(s_tuple)
     d_str = fnmatch.filter(s_tuple, '20*')[0]
     d_dt = dt.datetime.strptime(d_str, '%Y%m%d')
     return d_dt
@@ -102,12 +104,82 @@ def plotHistogramsForTif(filepath, targetDir=''):
     
     
     plt.savefig(figName)
+
+def histForEachPol(fp,targetDir):
+    if len(targetDir) < 1:
+        targetDir = os.path.dirname(fp)+'/hist/'
+    Path(targetDir).mkdir(parents=True, exist_ok=True)
+    splitDate = dateFromFilename(os.path.split(fp)[-1])
+    print(splitDate)
     
+    HH, HV = readBands(fp)
+    HH_flat = HH.flatten()
+    HV_flat = HV.flatten()
+    
+    if np.isnan(HV).all():
+        figName = targetDir+'hist_'+str(splitDate.date())+'_HH.pdf'
+        raise Exception('HV band of file '+fp+' is empty! \n Plotting histogram for HH band only')
+        plt.hist(HH_flat,color=colorDict['green'])
+        plt.ylabel('Pixel Count')
+        plt.xlabel('HH backscatter ([$\sigma_0$]=dB)')
+        plt.savefig(figName)
+        plt.show()
+        return
+    else:
+        HH_flat_nonan =  HH_flat[~ np.isnan(HH_flat)]
+        HV_flat_nonan =  HV_flat[~ np.isnan(HV_flat)]
+        
+        HH_flat = HH_flat_nonan
+        HV_flat = HV_flat_nonan
+        #print(np.histogram(HH_flat))
+        # HH histogram
+        fig_HH = plt.figure(dpi=200)
+        ax_HH = fig_HH.subplots(1)
+        ax_HH.hist(HH_flat,color=colorDict['green'], bins=12)
+        #ax_HH.hist(HH)
+        ax_HH.set_xlim(-32,15)
+        ax_HH.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
+        ax_HH.set_ylabel('Pixel Count')
+        plt.show()
+        
+        # HV histogram
+        fig_HV = plt.figure(dpi=200)
+        ax_HV = fig_HV.subplots(1)
+        ax_HV.hist(HV_flat,color=colorDict['orange'], bins=12)
+        ax_HV.set_xlim(-32,15)
+        ax_HV.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
+        ax_HV.set_ylabel('Pixel Count')
+        plt.show()
+        
+        # HH-HV ratio
+        HHHVratio = HH - HV
+        HHHV_flat = HHHVratio.flatten()
+        
+        # plot
+        fig_HHHV = plt.figure(dpi=200)
+        ax_HHHV = fig_HHHV.subplots(1)
+        ax_HHHV.hist(HHHV_flat,color=colorDict['darkYellow'])
+        ax_HHHV.set_xlabel('HH/HV backscatter ratio ([$\sigma_0$] = dB)')
+        ax_HHHV.set_ylabel('Pixel Count')
+        plt.show()
+        
+        figName_HH = targetDir+'hist_'+str(splitDate.date())+'_HH.pdf'
+        figName_HV = targetDir+'hist_'+str(splitDate.date())+'_HV.pdf'
+        figName_HHHV = targetDir+'hist_'+str(splitDate.date())+'_HHHV.pdf'
+    
+    fig_HH.savefig(figName_HH)
+    fig_HV.savefig(figName_HV)
+    fig_HHHV.savefig(figName_HHHV)
+
 def histForPols(inFolder,histFolder):
     for f in os.listdir(inFolder):
         if f.endswith('.tif'):
             plotHistogramsForTif(inFolder+'/'+f,histFolder)
 
+def histForEachPols2(inFolder, histFolder):
+    for f in os.listdir(inFolder):
+        if f.endswith('.tif'):
+            histForEachPol(inFolder+f, histFolder)
 
 #TODO:
     # histogram between HH/HV ratio
