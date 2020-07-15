@@ -17,7 +17,7 @@ red = Color('#D0103A')
 yellow = Color('#FDC82F')
 
 colorDict = {}
-colorDict['darkblue'] = '#002664'
+colorDict['darkBlue'] = '#002664'
 colorDict['darkAzure'] = '#00549f'
 colorDict['darkGreen'] = '#284e36'
 colorDict['darkOrange'] = '#9d5116'

@@ -135,20 +135,24 @@ def histForEachPol(fp,targetDir):
         # HH histogram
         fig_HH = plt.figure(dpi=200)
         ax_HH = fig_HH.subplots(1)
-        ax_HH.hist(HH_flat,color=colorDict['green'], bins=12)
+        ax_HH.hist(HH_flat,color=colorDict['green'])#, bins=12)
         #ax_HH.hist(HH)
-        ax_HH.set_xlim(-32,15)
+        ax_HH.set_xlim(-32,13)
+        ax_HH.set_ylim(0,3.55e7)
         ax_HH.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
         ax_HH.set_ylabel('Pixel Count')
+        fig_HH.subplots_adjust(bottom=0.24)
         plt.show()
         
         # HV histogram
         fig_HV = plt.figure(dpi=200)
         ax_HV = fig_HV.subplots(1)
-        ax_HV.hist(HV_flat,color=colorDict['orange'], bins=12)
-        ax_HV.set_xlim(-32,15)
+        ax_HV.hist(HV_flat,color=colorDict['orange'])#, bins=12)
+        ax_HV.set_xlim(-32,13)
+        ax_HV.set_ylim(0,3.55e7)
         ax_HV.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
         ax_HV.set_ylabel('Pixel Count')
+        fig_HV.subplots_adjust(bottom=0.24)
         plt.show()
         
         # HH-HV ratio
@@ -159,8 +163,11 @@ def histForEachPol(fp,targetDir):
         fig_HHHV = plt.figure(dpi=200)
         ax_HHHV = fig_HHHV.subplots(1)
         ax_HHHV.hist(HHHV_flat,color=colorDict['darkYellow'])
+        ax_HHHV.set_xlim(0,30)
+        ax_HHHV.set_ylim(0,6e7)
         ax_HHHV.set_xlabel('HH/HV backscatter ratio ([$\sigma_0$] = dB)')
         ax_HHHV.set_ylabel('Pixel Count')
+        fig_HHHV.subplots_adjust(bottom=0.24)
         plt.show()
         
         figName_HH = targetDir+'hist_'+str(splitDate.date())+'_HH.pdf'

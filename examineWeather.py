@@ -54,8 +54,8 @@ prcpDaily = prcp_new.groupby(prcp_new['Datetime']).aggregate(aggr_func_prcp)
 # remove precipitation < 0
 prcpDaily['prcp'] = prcpDaily['PRE (mm)'].apply(lambda x: nanForNeg(x))
 
-prcpDaily1920 = prcpDaily.loc[prcpDaily.index >= '2019-04-12']
-snowDepthDaily1920 = snowDepthDaily.loc[snowDepthDaily.index >= '2019-04-12']
+prcpDaily1920 = prcpDaily.loc[prcpDaily.index >= dt.datetime(2019, 4, 12)]
+snowDepthDaily1920 = snowDepthDaily.loc[snowDepthDaily.index >= dt.datetime(2019, 4, 12)]
 temp = temp.loc[temp.Date >= dt.datetime(2019, 4, 12)]
 
 def plotSnwPrcp():
@@ -131,23 +131,9 @@ def pltSnwPrcp():
     
 
 def plotTemp():
-#=============================================================================
-# =============================================================================
-#     d = temp.Date
-#     plt.plot(d,temp.Middel)
-#     plt.plot(d,temp.Laveste, '--')
-#     plt.plot(d, temp.Højeste, '--')
-#     # Customize the tickes on the graph
-#     plt.xticks(d,rotation=45, fontsize=10)   
-#     plt.xlabel('Date')
-#     plt.ylabel('Temperature [°C]')
-#     plt.title('Temperatures on Disko Island April 2019 - April 2020')
-#     plt.rcParams["figure.figsize"] = (40,5)
-# =============================================================================
-#=============================================================================
-
-# =============================================================================
-     fig, ax = plt.subplots()
+     #fig, ax = plt.subplots()
+     fig = plt.figure(dpi=200)
+     ax = fig.subplots(1)
      d = temp.Date
      ax.plot(d,temp.Middel, linewidth=1)
      ax.plot(d,temp.Laveste, '--', linewidth=0.3)
@@ -158,11 +144,22 @@ def plotTemp():
      ax.set_xlabel('Date')
      ax.set_ylabel(r'Temperature in $°C$')
      fig.autofmt_xdate(bottom=0.2)
-     fig.set_dpi(200)
-     plt.show()
+     fig.subplots_adjust(bottom=0.24)
      fig.show()
-# =============================================================================
-     #plt.show()
-# =============================================================================
-#plt.plot(list(prcpDaily.index), list(prcpDaily['prcp']))
-#plt.savefig('/Volumes/Transcend1/IIKT/thesis/report/plots/prcp.png')
+
+def plotPrcp():
+     #fig, ax = plt.subplots()
+     fig = plt.figure(dpi=200)
+     ax = fig.subplots(1)
+     d = temp.Date
+     ax.plot(d,temp.Middel, linewidth=1)
+     ax.plot(d,temp.Laveste, '--', linewidth=0.3)
+     ax.plot(d, temp.Højeste, '--', linewidth=0.3)
+     #ax.set_xticks(ax.get_xticks()[::10])
+      #ax.xticks.set_tick_params()
+     #ax.set_title('Temperatures at Qeqertarsuaq Heliport')
+     ax.set_xlabel('Date')
+     ax.set_ylabel(r'Temperature in $°C$')
+     fig.autofmt_xdate(bottom=0.2)
+     fig.subplots_adjust(bottom=0.24)
+     fig.show()
