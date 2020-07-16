@@ -21,6 +21,7 @@ import datetime as dt
 
 #filepath = '/Volumes/ElementsSE/thesisData/FCCbatch/FCC_Sigma0_HHHV_20190412.tif'
 targetDir = '/Volumes/ElementsSE/thesisData/hist/'
+inDir = '/Volumes/ElementsSE/thesisData/FCCclippedMsk2/'
 
 def readBands(filepath):
     file = rio.open(filepath)
@@ -177,6 +178,7 @@ def histForEachPol(fp,targetDir):
     fig_HH.savefig(figName_HH)
     fig_HV.savefig(figName_HV)
     fig_HHHV.savefig(figName_HHHV)
+    
 
 def histForPols(inFolder,histFolder):
     for f in os.listdir(inFolder):
