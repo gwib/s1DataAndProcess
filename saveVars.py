@@ -7,6 +7,7 @@ Created on Mon Jun 22 09:43:53 2020
 """
 
 import pickle
+arrayDir = '/Volumes/Transcend1/IIKT/Thesis/pyVarsPkl/'
 
 # obj0, obj1, obj2 are created here...
 fn = '/Users/GalinaJonat/Documents/IIKT/Thesis/analysis/dict.pkl'
@@ -20,3 +21,4 @@ def readHHHVdicts(fp=fn):
     with open(fp, 'rb') as f:
         mHH, sHH, mHV, sHV = pickle.load(f)
     return mHH, sHH, mHV, sHV
+
