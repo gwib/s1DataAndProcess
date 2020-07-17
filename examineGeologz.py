@@ -62,17 +62,18 @@ totalArea = sum(list(geoTypesDisko.SHAPE_Area))
 
 geoTypesDisko['area_perc'] = geoTypesDisko.SHAPE_Area.apply(lambda x: x/totalArea * 100)
 
-xax = []
-for i in geoTypesDisko.index:
-    xax.append(geolNames[i])
+def plotGeology():
+    xax = []
+    for i in geoTypesDisko.index:
+        xax.append(geolNames[i])
+        
+    plt.bar(geoTypesDisko.index, geoTypesDisko.area_perc, color=colorDict['darkYellow'])
     
-plt.bar(geoTypesDisko.index, geoTypesDisko.area_perc, color=colorDict['darkYellow'])
-
-
-
-plt.xticks(list(geoTypesDisko.index),xax, rotation=45, fontsize=8)
-plt.tick_params('x',length=5)
-plt.ylabel('Area coverage in $\%$', fontsize=14)
-plt.show()
+    
+    
+    plt.xticks(list(geoTypesDisko.index),xax, rotation=45, fontsize=8)
+    plt.tick_params('x',length=5)
+    plt.ylabel('Area coverage in $\%$', fontsize=14)
+    plt.show()
 
 

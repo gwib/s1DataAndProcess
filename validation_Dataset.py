@@ -45,6 +45,6 @@ glimsSub_short = glimsSub.drop(['local_id', 'glac_stat', 'subm_id', 'rc_id'], ax
 
 figGlimsHist, axGlimsHist = plt.subplots(dpi=150) 
 axGlimsHist.hist(glims.area, bins=10, color='#0098DB')
-axGlimsHist.set_xlabel('Glacier Count')
-axGlimsHist.set_ylabel(r'Glacier Area in $m^2$')
+axGlimsHist.set_ylabel('Glacier Count') #note:changed axis names, just need to rerun
+axGlimsHist.set_xlabel(r'Glacier Area in $m^2$')
 plt.show()
