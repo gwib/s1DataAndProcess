@@ -123,8 +123,18 @@ def pltSnwPrcp():
     ax2.bar(prcpDaily1920.index, prcpDaily1920.prcp, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
     #ax2.grid(color=colorDict['black45'])
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
-    plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+    #plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
+    #plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
+    for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.15)
     fig.tight_layout()
     fig.set_dpi(200)
     plt.show()
@@ -143,7 +153,18 @@ def plotTemp():
      #ax.set_title('Temperatures at Qeqertarsuaq Heliport')
      ax.set_xlabel('Date')
      ax.set_ylabel(r'Temperature in $°C$')
-     fig.autofmt_xdate(bottom=0.2)
+     
+     for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.15)
+     
      fig.subplots_adjust(bottom=0.24)
      fig.show()
 

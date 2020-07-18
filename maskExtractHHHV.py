@@ -17,10 +17,9 @@ from colours import colorDict
 ### predefined vars
 #mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/aligned_s2Mask.tif'
 mskFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/s2mskAligned_new_12600.tif'
-#for testing purposes
-fccPath = '/Volumes/ElementsSE/thesisData/FCCbatch_clipped/FCC_Sigma0_HHHV_20190412_clipped.tif'
+glimsMsk_fp = '/Volumes/ElementsSE/thesisData/Datasets/GlacierOutline/glimsNodataAndGlac_12600.tif' 
 # directory containing clipped tifs
-directory = r'/Volumes/ElementsSE/thesisData/FCCbatch_clipped'
+directory = r'/Volumes/ElementsSE/thesisData/FCCclippedMsk2/'
 
 def readSnwPrbMask(fp = mskFile, threshold=60):
     # import and create binary snow mask
@@ -58,7 +57,7 @@ def readSnwPrbMask(fp = mskFile, threshold=60):
 # next up --> extract bands from FCC to dict
 # read all files from directory
 
-def meanSdForTif(direc=directory,msk=mskFile):
+def meanSdForTifSnowMsk(direc=directory,msk=mskFile):
     # read boolean snow mask
     _, snwBool = readSnwPrbMask(msk) # modify threshold
     print (snwBool.shape)
@@ -88,28 +87,51 @@ def meanSdForTif(direc=directory,msk=mskFile):
             hvMean, hvSd = calcMeanSd(snwBool, hv)
         except:
             hvMean = np.nan
-            hvSd = np.nan
+
+        hhMeanDict[date] = hhMean
+        hhSdDict[date] = hhSd
             
-# =============================================================================
-#         # multiply glacier mask with polarisations
-#         hh_masked = np.multiply(snwBool, hh)
-#         hv_masked = np.multiply(snwBool, hv)
-#         
-#         #extract values for glaciarised areas
-#         hh_msk_val = extractVals(hh_masked)
-#         hv_msk_val = extractVals(hv_masked)
-#         
-#         # calculate mean and sd for glacierised areas
-#         hhMean = hh_msk_val.mean()
-#         hhSd = hh_msk_val.std()
-#         #print('Mean HH: ' + str(hhMean))
-#         #print('Standard dev HH: ' + str(hhSd))
-#             
-#         hvMean = hv_msk_val.mean()
-#         hvSd = hv_msk_val.std()
-#         #print('Mean HV: ' + str(hvMean))
-#         #print('Standard dev HV: ' + str(hvSd))
-# =============================================================================
+        hvMeanDict[date] = hvMean
+        hvSdDict[date] = hvSd
+        
+    plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict)
+    
+    return hhMeanDict, hhSdDict, hvMeanDict, hvSdDict
+
+def meanSdForGlims(direc=directory,msk=glimsMsk_fp):
+    # read boolean snow mask
+    glacMsk = rio.open(msk)
+    glacMsk_arr = glacMsk.read(1)
+    
+    hhMeanDict = {}
+    hhSdDict = {}
+    hvMeanDict = {}
+    hvSdDict = {}
+    
+    for entry in os.scandir(direc):
+        if entry.path.endswith(".tif") and entry.is_file():
+            print(entry)
+            # read fcc file
+            p = entry.path
+        else: continue
+        
+        
+        splitDate = dateFromFilename(os.path.split(p)[-1], 2)
+        #print(splitDate)
+        
+        date = splitDate.date()
+        print(date)
+        
+        hh, hv = readFcc(p) # original hh and hv with nan values
+        #print (max(hh))
+        #print(max(hv))
+        hhMean, hhSd = calcMeanSd(glacMsk_arr, hh)
+        
+        try:
+            hvMean, hvSd = calcMeanSd(glacMsk_arr, hv)
+        except:
+            hvMean = np.nan
+            hvSd = np.nan
          
         hhMeanDict[date] = hhMean
         hhSdDict[date] = hhSd
@@ -136,10 +158,7 @@ def calcMeanSd(boolMsk, pol):
     
 
 
-def readFcc(fPath=fccPath):
-    
-    #splitDate = dateFromFilename(os.path.split(fPath)[-1])
-    #print(splitDate)
+def readFcc(fPath):
     
     fcc = rio.open(fPath)
     #print(fcc.meta) # print metadata
@@ -150,7 +169,10 @@ def readFcc(fPath=fccPath):
     except: fcc_hv = np.nan
     
     fcc_hh[fcc_hh == 0] = np.nan
-    try: fcc_hv[fcc_hv == 0] = np.nan
+    fcc_hh[fcc_hh < -999] = np.nan
+    try:
+        fcc_hv[fcc_hv < -999] = np.nan
+        fcc_hv[fcc_hv == 0] = np.nan
     except: print('HV not available.')
     
     #plotPols(fcc_hh, fcc_hv, splitDate)
@@ -158,8 +180,6 @@ def readFcc(fPath=fccPath):
     #printMinMax(fcc_hh, fcc_hv)
     
     return fcc_hh, fcc_hv
-
-
 
 
 ####### PLOTS ######
@@ -180,12 +200,12 @@ def plotPols(hh, hv, date):
     
 def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     # Create a figure with customized size
-    fig = plt.figure(figsize=(10, 8))
-    ax = fig.add_subplot(111)
+    fig,ax = plt.subplots(dpi=180)
+    #ax = fig.add_subplot(111)
     
     # Set the axis lables
     #ax.set_xlabel('Date',fontsize=14)
-    ax.set_ylabel(r'Mean $\sigma_0$ in $dB$',fontsize=14)
+    ax.set_ylabel(r'Mean $\sigma_0$ in $dB$',fontsize=13)
     
     # X axis is day numbers from 1 to 15
     dates = list(hhMeanDict.keys())
@@ -215,21 +235,14 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
     # Create an error bar for each dataset
     line_HH=ax.errorbar(xaxis, HHmean_y, yerr=HHsd, **lineStyle_HH, color=color_HH, label='HH')
     line_HV=ax.errorbar(xaxis, HVmean_y, yerr=HVsd, **lineStyle_HV, color=color_HV, label='HV')
-    
-    # Label each dataset on the graph, xytext is the label's position 
-    #for i, txt in enumerate(HHmean_y):
-    #        ax.annotate(txt, xy=(xaxis[i], HHmean_y[i]), xytext=(xaxis[i]+0.03, HHmean_y[i]+0.3),color=color_HH)
-    
-    #for i, txt in enumerate(HVmean_y):
-    #        ax.annotate(txt, xy=(xaxis[i], HVmean_y[i]), xytext=(xaxis[i]+0.03, HVmean_y[i]+0.3),color=color_HV)
-            
+      
     
     # Draw a legend bar
     plt.legend(handles=[line_HH, line_HV], loc='upper right')
     
     # Customize the tickes on the graph
-    plt.xticks(xaxis,rotation=45)           
-    plt.xlabel('Date',fontsize=14)    
+    #plt.xticks(xaxis,rotation=45,fontsize=8)           
+    #plt.xlabel('Date',fontsize=10)    
     #plt.yticks(np.arange(20, 47, 2))
     
     # Customize the legend font and handle length
@@ -239,8 +252,18 @@ def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
 
     
     # Draw a grid for the graph
+    plt.grid(color=colorDict['black15'])
     
-    
+    for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.15)
     #ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
     
     plt.show()
@@ -270,14 +293,24 @@ def plotMeanDiff(hhMeanDict, hvMeanDict):
         hh.append(hhMeanDict[d])
         hv.append(hvMeanDict[d])
     hhMinusHv = [a_i - b_i for a_i, b_i in zip(hh, hv)]
-    plt.plot(dates, hhMinusHv, color=colorDict['yellow'])
+    
+    fig,ax = plt.subplots(dpi=180)
+    ax.plot(dates, hhMinusHv, color=colorDict['yellow'])
     plt.grid(color=colorDict['black15'])
-    plt.xticks(dates,rotation=45)
-    plt.ylabel(r'HH [$dB$] - HV [$dB$]', fontsize=14)
-    plt.ylim(bottom=6,top=10.5)
-    #plt.dpi(150)
-    #plt.xlabel('Date')
-    #plt.autofmt_xdate(bottom=0.2)
+    #plt.xticks(dates,rotation=45)
+    plt.ylabel(r'HH [$dB$] - HV [$dB$]', fontsize=13)
+    #plt.ylim(bottom=6,top=10.5)
+    
+    for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.15)
     
     
 ###### HELPER FUNCTIONS #####
