@@ -118,6 +118,7 @@ def histForEachPol(fp,targetDir):
     HV_flat = HV.flatten()
     
     if np.isnan(HV).all():
+        np.histogram(HH_flat)
         figName = targetDir+'hist_'+str(splitDate.date())+'_HH.pdf'
         raise Exception('HV band of file '+fp+' is empty! \n Plotting histogram for HH band only')
         plt.hist(HH_flat,color=colorDict['green'])
@@ -132,6 +133,9 @@ def histForEachPol(fp,targetDir):
         
         HH_flat = HH_flat_nonan
         HV_flat = HV_flat_nonan
+        
+        np.histogram(HH_flat)
+        np.histogram(HV_flat)
         #print(np.histogram(HH_flat))
         # HH histogram
         fig_HH = plt.figure(dpi=200)
@@ -178,7 +182,28 @@ def histForEachPol(fp,targetDir):
     fig_HH.savefig(figName_HH)
     fig_HV.savefig(figName_HV)
     fig_HHHV.savefig(figName_HHHV)
+ 
+def printHistForEachPol(fp):
+    splitDate = dateFromFilename(os.path.split(fp)[-1])
+    print(splitDate)
+    HH, HV = readBands(fp)
+    HH_flat = HH.flatten()
+    HV_flat = HV.flatten()
     
+    print('Histogram HH')
+    if np.isnan(HV).all():
+        np.histogram(HH_flat)
+    else:
+        HH_flat_nonan =  HH_flat[~ np.isnan(HH_flat)]
+        HV_flat_nonan =  HV_flat[~ np.isnan(HV_flat)]
+        
+        HH_flat = HH_flat_nonan
+        HV_flat = HV_flat_nonan
+        
+        print(np.histogram(HH_flat))
+        
+        print(np.histogram(HV_flat))
+ 
 
 def histForPols(inFolder,histFolder):
     for f in os.listdir(inFolder):

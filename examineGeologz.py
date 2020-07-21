@@ -20,13 +20,13 @@ gm_count = Counter(list(geolDisko.GM_LABEL))
 
 geol_group = {}
 # volcanic rocks
-geol_group[1] = ['Vph','MNN','MR','MRA','Vpb','a','gn','deltT1']#,'ms','MS'] #volcanic rocks
+geol_group[1] = ['Vph','MNN','MR','MRA','Vpb','a','gn','deltT1','NAt']#,'ms','MS'] #volcanic rocks
 geol_group[2] = ['ICE'] # ice
 geol_group[3] = ['LAK'] # lakes
 geol_group[4] = ['NAK'] # marine sandstone
 geol_group[5] = ['NAS'] # non-marine sandstone
 geol_group[6] = ['Q10'] #rock slides
-geol_group[7] = ['NAt'] # fossils
+#geol_group[7] = ['NAt'] # fossils
 geol_group[8] = ['Q7'] # glaciofluvial and marine deposits
 geol_group[9] = ['Qundif', 'NU', 'ms', 'MS']
 
@@ -37,7 +37,7 @@ geolNames[3] = 'Lake'
 geolNames[4] = f'Marine \n Sandstone'
 geolNames[5] = f'Non-marine \n Sandstone'
 geolNames[6] = f'Rock Slides'
-geolNames[7] = 'Fossils'
+#geolNames[7] = 'Fossils'
 geolNames[8] = f'Glaciofluvial \n and Marine \n Deposits'
 geolNames[9] = f'Un-\ndifferentiated\nDeposits'
 

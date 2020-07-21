@@ -20,7 +20,11 @@ from examineGeologz import geolNames
 
 # decision tree
 from sklearn import tree
+
 import graphviz # to visualise graph
+
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
 
 
 geolNames[-9999]='NaN'
@@ -53,24 +57,40 @@ def readBands(filepath):
 #----INPUT data
 # DEM
 # tifs of satellite img
-
-
+geoFp = '/Volumes/ElementsSE/thesisData/Datasets/geologicalMap/geolTypesRaster_12600.tif' # contains 8 target group plus nan group
+binFp = '/Volumes/ElementsSE/thesisData/Datasets/GlacierOutline/glimsRaster_12600.tif'
 #---TARGET DEFINITION file---
 #geology groups
-def readTargetFile():
-    targetFile_dir = '/Volumes/ElementsSE/thesisData/Datasets/geologicalMap/'
-    target_f = 'geolTypesRaster_12600.tif'
-    target_raster = rio.open(targetFile_dir+target_f)
+def readTargetFile(targetFp=geoFp):
+    #target_f = 'geolMap_8groups.tif'
+    target_raster = rio.open(targetFp)
     target_arr = target_raster.read(1)
     target_arr_nan = setMskValue(target_arr)
     target_msk_flat = target_arr_nan.flatten()
     return target_msk_flat
 
+# =============================================================================
+# def readTargetFile2():
+#     targetFile_dir = '/Volumes/ElementsSE/thesisData/Datasets/geologicalMap/'
+#     target_f = 'geolMap_8groups.tif'
+#     target_raster = rio.open(targetFile_dir+target_f)
+#     target_arr = target_raster.read(1)
+#     target_arr_nan = setMskValue(target_arr)
+#     #target_arr_nan[[.replace()]]
+# =============================================================================
 
-target_msk_flat = readTargetFile()
+geo_msk_flat = readTargetFile(geoFp)
+bin_msk_flat = readTargetFile(binFp)
 #---TEST data---
 inDir = '/Volumes/ElementsSE/thesisData/FCCclippedMsk2/'
 inFile = 'FCC_Sigma0_HHHV_20191009_clipped_msk_12600.tif'
+
+
+snowProbFile = '/Volumes/ElementsSE/thesisData/validation/s2Mask/maskBool/s2mskAligned_new_12600.tif'
+snwMsk = rio.open(snowProbFile)
+snwMsk_arr = snwMsk.read(1)
+snwprb_flat = snwMsk_arr.flatten()
+
 
 def readAndStackBands(fp):
     hh_msk,hv_msk = readBands(fp)
@@ -82,13 +102,34 @@ def readAndStackBands(fp):
     hhhv_stacked = np.stack((hh_msk_flat,hv_msk_flat),axis=1)
     return hhhv_stacked
 
-def decTreeHHHV(fp=inDir+inFile,targetMsk=target_msk_flat,tree_depth=3):
+def readAndStackBandsInclSnwProb(fp,snwprobfp=''):
+    if len(snwprobfp)<3:
+        snwprob_flat = snwprb_flat
+    else:
+        snwprb = rio.open(snwprobfp)
+        snwprb_arr = snwprb.read(1)
+        snwprob_flat = snwprb_arr.flatten()
+    
+    hh_msk,hv_msk = readBands(fp)
+    
+    hh_msk_flat = hh_msk.flatten()
+    hv_msk_flat = hv_msk.flatten()
+    
+    # stack hh hv arrays as input features for classification
+    stacked = np.stack((hh_msk_flat,hv_msk_flat,snwprob_flat),axis=1)
+    return stacked
+
+def decTreeHHHV(fp=inDir+inFile,targetMsk=geo_msk_flat,tree_depth=3,b=True):
     # reading bands, flatting them and preparing them for classification
     hhhv_stacked=readAndStackBands(fp)
     
     # Training decision tree
-    clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth)
-    clf.fit(hhhv_stacked,targetMsk)
+    if b==True:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth,class_weight='balanced')
+        clf.fit(hhhv_stacked,targetMsk)
+    else:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth)
+        clf.fit(hhhv_stacked,targetMsk)
     
     
     # to visualise
@@ -104,6 +145,32 @@ def decTreeHHHV(fp=inDir+inFile,targetMsk=target_msk_flat,tree_depth=3):
     
     return clf, graph
 
+def decTreeHHHVsnwprb(fp=inDir+inFile,targetMsk=bin_msk_flat,tree_depth=3,b=True):
+    stacked = readAndStackBandsInclSnwProb(fp,snwprobfp='')
+        # Training decision tree
+    if b==True:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth,class_weight='balanced')
+        clf.fit(stacked,targetMsk)
+    else:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth)
+        clf.fit(stacked,targetMsk)
+    
+    
+    # to visualise
+    clf_classes = clf.classes_
+    classNames = []
+    if len(clf_classes) > 2:
+        for c in clf_classes:
+            classNames.append(geolNames[c])
+    else:
+        classNames = ['Other or NaN', 'Ice']
+        
+    
+    clfTree_hhhv_dot = tree.export_graphviz(clf,feature_names=['HH','HV', 'Snow Probability'],class_names=classNames)
+    
+    graph = graphviz.Source(clfTree_hhhv_dot)
+    
+    return clf, graph
 
 def predictFromTree(inFp, dtree,outfn):
     hhhv_stacked = readAndStackBands(inFp)
@@ -111,30 +178,32 @@ def predictFromTree(inFp, dtree,outfn):
     pred_reshaped = pred.reshape(-1,11908)
     meta_outFile = {'driver': 'GTiff', 'dtype': 'float32', 'nodata': -9999.0, 'width': 11908, 'height': 12600, 'count': 1, 'crs': CRS.from_epsg(3413), 'transform': Affine(10.0, 0.0, -384702.1263054441,
            0.0, -10.0, -2122443.806211936)}
-    with rio.open(decisionTree_folder+outfn,'w',**meta_outFile) as outTif:
+    with rio.open(outfn,'w',**meta_outFile) as outTif:
+        outTif.write(pred_reshaped,indexes=1)
+
+def predictFromTreeSnwprb(inFp, dtree,outfn,snwPrbfp=''):
+    hhhv_stacked = readAndStackBandsInclSnwProb(inFp)
+    pred = dtree.predict(hhhv_stacked)
+    pred_reshaped = pred.reshape(-1,11908)
+    meta_outFile = {'driver': 'GTiff', 'dtype': 'float32', 'nodata': -9999.0, 'width': 11908, 'height': 12600, 'count': 1, 'crs': CRS.from_epsg(3413), 'transform': Affine(10.0, 0.0, -384702.1263054441,
+           0.0, -10.0, -2122443.806211936)}
+    with rio.open(outfn,'w',**meta_outFile) as outTif:
         outTif.write(pred_reshaped,indexes=1)
 
 
-# with HH
-# with HV
-def predictExample():
-    # plot decision tree
-    #tree.plot_tree(clf)
-    decTreeOct9_3,graphOct9_3 = decTreeHHHV()
-    hhhv_stacked_Oct21 = readAndStackBands(inDir+'FCC_Sigma0_HHHV_20191021_clipped_msk_12600.tif')
-    predOct21 = decTreeOct9_3.predict(hhhv_stacked_Oct21)
-    predOct21_reshaped = predOct21.reshape(-1,11908)
-    
-    hhhv_stacked_Dec08 = readAndStackBands(inDir+'FCC_Sigma0_HHHV_20191208_clipped_msk_12600.tif')
-    predDec08 = decTreeOct9_3.predict(hhhv_stacked_Dec08)
-    predDec08_reshaped = predDec08.reshape(-1,11908)
-    ###EXAMPLE OCTOBER 2019####
-    meta_outFile = {'driver': 'GTiff', 'dtype': 'float32', 'nodata': -9999.0, 'width': 11908, 'height': 12600, 'count': 1, 'crs': CRS.from_epsg(3413), 'transform': Affine(10.0, 0.0, -384702.1263054441,
-           0.0, -10.0, -2122443.806211936)}
-    with rio.open(decisionTree_folder+'Oct21pred-tree_3_new.tif','w',**meta_outFile) as outTif:
-        outTif.write(predOct21_reshaped,indexes=1)
-        
-    with rio.open(decisionTree_folder+'Dec08pred-tree_3_new.tif','w',**meta_outFile) as outTif:
-        outTif.write(predDec08_reshaped,indexes=1)
-    return decTreeOct9_3,graphOct9_3
 
+def treeWithCrossVal(fp=inDir+inFile,target=bin_msk_flat,tree_depth=3,b=True):
+    hhhv_stacked=readAndStackBands(fp)
+    # split data in training and test set
+    X_train, X_test, y_train, y_test = train_test_split(hhhv_stacked,target,test_size=0.4, random_state=13)
+    if b==True:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth,class_weight='balanced')
+        clf.fit(X_train,y_train)
+    else:
+        clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth)
+        clf.fit(X_train,y_train)
+        
+    print('--Cross validation score for tree with depth (Accuracy for each target group)'+tree_depth+'--')
+    print(cross_val_score(X_test, y_test))
+    
+    

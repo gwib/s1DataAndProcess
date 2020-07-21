@@ -163,7 +163,7 @@ def plotTemp():
             for label in ax.get_xticklabels():
                 label.set_visible(False)
             ax.set_xlabel('')
-    fig.subplots_adjust(bottom=0.15)
+     #fig.subplots_adjust(bottom=0.15)
      
      fig.subplots_adjust(bottom=0.24)
      fig.show()

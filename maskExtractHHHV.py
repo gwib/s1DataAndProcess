@@ -156,6 +156,92 @@ def calcMeanSd(boolMsk, pol):
     
     return polMean, polSd
     
+def maskedHistogram(boolMsk,direc,pltDir):
+    for entry in os.scandir(direc):
+        if entry.path.endswith(".tif") and entry.is_file():
+            print(entry)
+            # read fcc file
+            p = entry.path
+        else: continue
+        
+        
+        splitDate = dateFromFilename(os.path.split(p)[-1], 2)
+        #print(splitDate)
+        
+        date = splitDate.date()
+        print(date)
+        
+        hh, hv = readFcc(p)
+        
+        HH_flat = hh.flatten()
+        HV_flat = hv.flatten()
+    
+        if np.isnan(HV_flat).all():
+            figName = pltDir+'hist_'+str(splitDate.date())+'_HH.pdf'
+            raise Exception('HV band of file '+str(entry)+' is empty! \n Plotting histogram for HH band only')
+            np.histogram(HH_flat)
+            fig_HH = plt.figure(dpi=200)
+            fig_HH.hist(HH_flat,color=colorDict['green'])
+            plt.ylabel('Pixel Count')
+            plt.xlabel('HH backscatter ([$\sigma_0$]=dB)')
+            plt.savefig(figName)
+            plt.show()
+            return
+        else:
+            HH_flat_nonan =  HH_flat[~ np.isnan(HH_flat)]
+            HV_flat_nonan =  HV_flat[~ np.isnan(HV_flat)]
+            print('---HH Hist---')
+            print(np.histogram(HH_flat_nonan))
+            print('---HV Hist---')
+            print(np.histogram(HV_flat_nonan))
+            HH_flat = HH_flat_nonan
+            HV_flat = HV_flat_nonan
+            #print(np.histogram(HH_flat))
+            # HH histogram
+            fig_HH = plt.figure(dpi=200)
+            ax_HH = fig_HH.subplots(1)
+            ax_HH.hist(HH_flat,color=colorDict['green'])#, bins=12)
+            #ax_HH.hist(HH)
+            ax_HH.set_xlim(-32,13)
+            ax_HH.set_ylim(0,3.55e7)
+            ax_HH.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
+            ax_HH.set_ylabel('Pixel Count')
+            fig_HH.subplots_adjust(bottom=0.24)
+            plt.show()
+            
+            # HV histogram
+            fig_HV = plt.figure(dpi=200)
+            ax_HV = fig_HV.subplots(1)
+            ax_HV.hist(HV_flat,color=colorDict['orange'])#, bins=12)
+            ax_HV.set_xlim(-32,13)
+            ax_HV.set_ylim(0,3.55e7)
+            ax_HV.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
+            ax_HV.set_ylabel('Pixel Count')
+            fig_HV.subplots_adjust(bottom=0.24)
+            plt.show()
+            
+            # HH-HV ratio
+            HHHVratio = hh - hv
+            HHHV_flat = HHHVratio.flatten()
+            
+            # plot
+            fig_HHHV = plt.figure(dpi=200)
+            ax_HHHV = fig_HHHV.subplots(1)
+            ax_HHHV.hist(HHHV_flat,color=colorDict['darkYellow'])
+            ax_HHHV.set_xlim(0,30)
+            ax_HHHV.set_ylim(0,6e7)
+            ax_HHHV.set_xlabel('HH/HV backscatter ratio ([$\sigma_0$] = dB)')
+            ax_HHHV.set_ylabel('Pixel Count')
+            fig_HHHV.subplots_adjust(bottom=0.24)
+            plt.show()
+            
+            figName_HH = pltDir+'glachist_'+str(date)+'_HH.pdf'
+            figName_HV = pltDir+'glachist_'+str(date)+'_HV.pdf'
+            figName_HHHV = pltDir+'glachist_'+str(date)+'_HHHV.pdf'
+        
+        fig_HH.savefig(figName_HH)
+        fig_HV.savefig(figName_HV)
+        fig_HHHV.savefig(figName_HHHV)
 
 
 def readFcc(fPath):
