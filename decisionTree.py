@@ -203,7 +203,21 @@ def treeWithCrossVal(fp=inDir+inFile,target=bin_msk_flat,tree_depth=3,b=True):
         clf = tree.DecisionTreeClassifier(random_state=0, max_depth=tree_depth)
         clf.fit(X_train,y_train)
         
-    print('--Cross validation score for tree with depth (Accuracy for each target group)'+tree_depth+'--')
+    print('--Cross validation score for tree with depth (Accuracy for each target group)'+str(tree_depth)+'--')
     print(cross_val_score(X_test, y_test))
     
+        # to visualise
+    clf_classes = clf.classes_
+    classNames = []
+    if len(clf_classes) > 2:
+        for c in clf_classes:
+            classNames.append(geolNames[c])
+    else:
+        classNames = ['Other or NaN', 'Ice']
+    
+    clfTree_dot = tree.export_graphviz(clf,feature_names=['HH','HV'],class_names=classNames)
+    
+    graph = graphviz.Source(clfTree_dot)
+    
+    return clf, graph
     
