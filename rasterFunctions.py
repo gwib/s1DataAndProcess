@@ -57,6 +57,55 @@ def dateFromFilename(fn,dloc=1):
 #     s2 = s1.split('.')[0]
 #     return s2
 # =============================================================================
+def plotHistogramsForTifNoFlatten(filepath, targetDir=''):
+    
+    if len(targetDir) < 1:
+        targetDir = os.path.dirname(filepath)+'/hist/'
+    
+    splitDate = dateFromFilename(os.path.split(filepath)[-1])
+    print(splitDate)
+    figName = targetDir+'hist_'+str(splitDate.date())+'.pdf'
+    print(figName)
+    HH, HV = readBands(filepath)
+    # flatten tif values, such that histogram can be in one colour
+
+    
+    if np.isnan(HV).all():
+        raise Exception('HV band of file '+filepath+' is empty! \n Plotting histogram for HH band only')
+        plt.hist(HH,color=colorDict['green'])
+        plt.ylabel('Pixel Count')
+        plt.xlabel('HH backscatter ([$\sigma_0$]==dB)')
+        #plt.title('HH reflection histogram for the entire image')
+    else:
+        # subplot with shared x-axis
+        fig=plt.figure(dpi=200)
+        ax1, ax2 = fig.subplots(2)
+        #ax1 = fig.subplot(211)
+        #ax2 = fig.subplot(212)
+        
+        ax1.hist(HH,color=[colorDict['green']]*11908)
+        ax2.hist(HV,color=[colorDict['orange']]*11908)
+        
+        ax1.set_xlabel('HH backscatter in dB')
+        ax2.set_xlabel('HV backscatter in dB')
+        ax1.set_ylabel('Pixel Count')
+        ax2.set_ylabel('Pixel Count')
+        ax1.set_xlim(-32,13)
+        ax2.set_xlim(-32,13)
+        #fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
+        
+        ax1.get_shared_x_axes().join(ax1, ax2)
+        #ax1.set_xticklabels([])
+        # ax2.autoscale() ## call autoscale if needed
+    
+    fig.subplots_adjust(hspace=0.472, bottom=0.15)
+    plt.show()
+    Path(targetDir).mkdir(parents=True, exist_ok=True)
+    
+    
+    plt.savefig(figName)
+
+
 
 def plotHistogramsForTif(filepath, targetDir=''):
     
@@ -86,8 +135,12 @@ def plotHistogramsForTif(filepath, targetDir=''):
         #ax1 = fig.subplot(211)
         #ax2 = fig.subplot(212)
         
-        ax1.hist(HH_flat,color=colorDict['green'], bins=12)
-        ax2.hist(HV_flat,color=colorDict['orange'], bins=12)
+        ax1.hist(HH_flat,color=colorDict['green'])
+        ax2.hist(HV_flat,color=colorDict['orange'])
+        
+        
+        ax1.set_xlim(-32,13)
+        ax2.set_xlim(-32,13)
         
         ax1.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
         ax2.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')

@@ -25,73 +25,90 @@ def nanForNeg(x):
 # Home
 prcpFile = "/Volumes/Transcend1/IIKT/Thesis/Datasets/weather/View_ClimateBasis_Disko_Data_Precipitation_Precipitation__60min_sample_mm270520201658405828.csv"
 snwDepthFile = "/Volumes/Transcend1/IIKT/Thesis/Datasets/weather/View_ClimateBasis_Disko_Data_Snow_depth_Snow_depth__60min_average_m270520201657165978.csv"
-tempFile = "/Volumes/Transcend1/IIKT/Thesis/Datasets/weather/qeqertarsuaq-heliport-daily-20192020.csv"
+tempFile1920 = "/Volumes/Transcend1/IIKT/Thesis/Datasets/weather/temp19-20/qeqertarsuaq-heliport-daily-20192020.csv"
 metFile = "/Volumes/ElementsSE/thesisData/weather/View_GeoBasis_Disko_Data_Meteorology_AWS2Meteorology030720201034510908.csv"
 
 
-prcp = pd.read_csv(prcpFile, delimiter="\t", encoding="unicode_escape")
-snowDepth = pd.read_csv(snwDepthFile, delimiter="\t", encoding="unicode_escape")
-temp = pd.read_csv(tempFile, delimiter=";")#, encoding="unicode_escape")
+def readTempFromFile(tempFp):
+    temp_df = pd.read_csv(tempFp, delimiter=";")
+    temp_df['Date'] = temp_df.DateTime.apply(lambda x: dt.datetime.strptime(x.split()[0], '%Y-%m-%d'))
+    return temp_df
 
-temp['Date'] = temp.DateTime.apply(lambda x: dt.datetime.strptime(x.split()[0], '%Y-%m-%d'))
-# snow depth
-snowDepth['Date'] = snowDepth[snowDepth.columns[0]]
-snowDepth['Datetime'] = snowDepth['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
-snowDepth_new = snowDepth[['Datetime', 'SD (m)']].copy()
-aggregation_functions_snowDepth = {'SD (m)': 'mean'} # snow depth
+def readPrcpFile(prcpFile):
+    prcp = pd.read_csv(prcpFile, delimiter="\t", encoding="unicode_escape")
+    # Precipitation
+    prcp['Date'] = prcp[prcp.columns[0]]
+    prcp['Datetime'] = prcp['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
+    prcp_new = prcp[['Datetime', 'PRE (mm)']].copy()
+    aggr_func_prcp = {'PRE (mm)': 'sum'}
+    # total precipitation per day
+    prcpDaily = prcp_new.groupby(prcp_new['Datetime']).aggregate(aggr_func_prcp)
+    # remove precipitation < 0
+    prcpDaily['prcp'] = prcpDaily['PRE (mm)'].apply(lambda x: nanForNeg(x))
+    return prcpDaily
 
-snowDepthDaily = snowDepth_new.groupby(snowDepth_new['Datetime']).aggregate(aggregation_functions_snowDepth)
+def readSnwDepth(snwDepthFile):
+    snowDepth = pd.read_csv(snwDepthFile, delimiter="\t", encoding="unicode_escape")
+    snowDepth['Date'] = snowDepth[snowDepth.columns[0]]
+    snowDepth['Datetime'] = snowDepth['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
+    snowDepth_new = snowDepth[['Datetime', 'SD (m)']].copy()
+    aggregation_functions_snowDepth = {'SD (m)': 'mean'} # snow depth
+    
+    snowDepthDaily = snowDepth_new.groupby(snowDepth_new['Datetime']).aggregate(aggregation_functions_snowDepth)
+    snowDepthDaily['SnwDepth_avg'] = snowDepthDaily['SD (m)'].apply(lambda x: nanForNeg(x))
+    
+    return snowDepthDaily
 
-snowDepthDaily['SnwDepth_avg'] = snowDepthDaily['SD (m)'].apply(lambda x: nanForNeg(x))
+# =============================================================================
+# 
+# # Precipitation
+# prcp1920 = pd.read_csv(prcpFile1920, delimiter="\t", encoding="unicode_escape")
+# prcp1920['Date'] = prcp1920[prcp1920.columns[0]]
+# prcp1920['Datetime'] = prcp1920['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
+# prcp_new1920 = prcp1920[['Datetime', 'PRE (mm)']].copy()
+# aggr_func_prcp = {'PRE (mm)': 'sum'}
+# # total precipitation per day
+# prcpDaily1920 = prcp_new1920.groupby(prcp_new1920['Datetime']).aggregate(aggr_func_prcp)
+# # remove precipitation < 0
+# prcpDaily1920['prcp'] = prcpDaily1920['PRE (mm)'].apply(lambda x: nanForNeg(x))# Precipitation
+# prcp1920['Date'] = prcp1920[prcp1920.columns[0]]
+# prcp1920['Datetime'] = prcp1920['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
+# prcp_new1920 = prcp1920[['Datetime', 'PRE (mm)']].copy()
+# aggr_func_prcp = {'PRE (mm)': 'sum'}
+# # total precipitation per day
+# prcpDaily1920 = prcp_new1920.groupby(prcp_new1920['Datetime']).aggregate(aggr_func_prcp)
+# # remove precipitation < 0
+# prcpDaily1920['prcp'] = prcpDaily1920['PRE (mm)'].apply(lambda x: nanForNeg(x))
+#
+# Snow Depth
+# snowDepth1920 = pd.read_csv(snwDepthFile1920, delimiter="\t", encoding="unicode_escape")
+# snowDepth1920['Date'] = snowDepth1920[snowDepth1920.columns[0]]
+# snowDepth1920['Datetime'] = snowDepth1920['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
+# snowDepth1920_new = snowDepth1920[['Datetime', 'SD (m)']].copy()
+# aggregation_functions_snowDepth = {'SD (m)': 'mean'} # snow depth
 
-# Precipitation
-prcp['Date'] = prcp[prcp.columns[0]]
-prcp['Datetime'] = prcp['Date'].apply(lambda x: dt.datetime.strptime(x, '%Y-%m-%d'))
-prcp_new = prcp[['Datetime', 'PRE (mm)']].copy()
-aggr_func_prcp = {'PRE (mm)': 'sum'}
-# total precipitation per day
-prcpDaily = prcp_new.groupby(prcp_new['Datetime']).aggregate(aggr_func_prcp)
-# remove precipitation < 0
-prcpDaily['prcp'] = prcpDaily['PRE (mm)'].apply(lambda x: nanForNeg(x))
+# snowDepth1920Daily = snowDepth1920_new.groupby(snowDepth1920_new['Datetime']).aggregate(aggregation_functions_snowDepth)
+
+# snowDepth1920Daily['SnwDepth_avg'] = snowDepth1920Daily['SD (m)'].apply(lambda x: nanForNeg(x))
+# =============================================================================
+
+
+
+
+temp1920 = readTempFromFile(tempFile1920)
+prcpDaily= readPrcpFile(prcpFile)
+snowDepthDaily = readSnwDepth(snwDepthFile)
+
+
 
 prcpDaily1920 = prcpDaily.loc[prcpDaily.index >= dt.datetime(2019, 4, 12)]
 snowDepthDaily1920 = snowDepthDaily.loc[snowDepthDaily.index >= dt.datetime(2019, 4, 12)]
-temp = temp.loc[temp.Date >= dt.datetime(2019, 4, 12)]
+temp1920 = temp1920.loc[temp1920.Date >= dt.datetime(2019, 4, 12)]
 
-def plotSnwPrcp():
-    dates = list(prcpDaily.index)
-    # subplot with shared x-axis
-    fig=plt.figure()
-    ax1 = plt.subplot(211)
-    ax2 = plt.subplot(212)
-    
-    ax1.bar(prcpDaily1920.index, prcpDaily1920.prcp, color=colorDict['darkblue'])
-    ax2.plot(snowDepthDaily1920.index, snowDepthDaily1920.SnwDepth_avg)
-        
-    #ax1.set_title('Precipitation')
-    #ax2.set_title('Snow Depth')
-    
-    ax1.set_ylabel(r'Precipitation in $mm$')
-    ax2.set_ylabel(r'Snow depth in $m$')
-    
-
-    ax1.grid(color='lightgrey', linestyle='-')
-    ax1.set_facecolor('w')
-    ax2.grid(color='lightgrey', linestyle='-')
-    ax2.set_facecolor('w')    
-    #fig.suptitle('Histogram for polarisation on '+splitDate, fontsize=14)
-    
-    ax1.get_shared_x_axes().join(ax1, ax2)
-    # Customize the tickes on the graph
-    #plt.xticks(dates,rotation=45, fontsize=10)               
-    #plt.yticks(np.arange(20, 47, 2))
-    #ax2.set_xticklabels(list(prcpDaily1920.index))
-    ax2.autoscale() ## call autoscale if needed
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
-    plt.setp(ax2.xaxis.get_majorticklabels(), rotation=45)
-        
-    plt.show()
-
+snowDepthDaily1619 = snowDepthDaily.loc[snowDepthDaily.index >= dt.datetime(2016, 4, 1)]
+snowDepthDaily1619 = snowDepthDaily1619.loc[snowDepthDaily1619.index <= dt.datetime(2019, 12, 30)]
+prcpDaily1619 = prcpDaily.loc[prcpDaily.index >= dt.datetime(2016, 4, 1)]
+prcpDaily1619 = prcpDaily1619.loc[prcpDaily1619.index <= dt.datetime(2019, 12, 30)]
 
 def subplotsSnwPrcp():
     dates = snowDepthDaily1920.index
@@ -106,13 +123,13 @@ def subplotsSnwPrcp():
 #plt.plot(list(snowDepthDaily.index), list(snowDepthDaily['SnwDepth_avg']))
 #plt.savefig('/Volumes/Transcend1/IIKT/thesis/report/plots/snowDepth.png')
 
-def pltSnwPrcp():
-    fig, ax1 = plt.subplots()
+def pltSnwPrcp(snowDepthDaily,prcpDaily):
+    fig, ax1 = plt.subplots(dpi=200)
     
     color=colorDict['blue']
     ax1.set_xlabel('Date')
     ax1.set_ylabel(r'Snow depth in $m$', color=color)
-    ax1.plot(snowDepthDaily1920.index, snowDepthDaily1920.SnwDepth_avg, color=color)
+    ax1.plot(snowDepthDaily.index, snowDepthDaily.SnwDepth_avg, color=color)
     ax1.tick_params(axis='y', labelcolor=color)
     
     #ax1.grid(color=colorDict['black15'], linestyle='-')
@@ -120,7 +137,7 @@ def pltSnwPrcp():
     color='#000000'
     ax2 = ax1.twinx()
     ax2.set_ylabel(r'Precipitation in $mm$', color=color)
-    ax2.bar(prcpDaily1920.index, prcpDaily1920.prcp, color=color)
+    ax2.bar(prcpDaily.index, prcpDaily.prcp, color=color)
     ax2.tick_params(axis='y', labelcolor=color)
     #ax2.grid(color=colorDict['black45'])
     #plt.setp(ax1.xaxis.get_majorticklabels(), rotation=45)
@@ -136,11 +153,12 @@ def pltSnwPrcp():
             ax.set_xlabel('')
     fig.subplots_adjust(bottom=0.15)
     fig.tight_layout()
-    fig.set_dpi(200)
+    align_yaxis_np(ax1,ax2)
+    #fig.set_dpi(200)
     plt.show()
     
 
-def plotTemp():
+def plotTemp(temp):
      #fig, ax = plt.subplots()
      fig = plt.figure(dpi=200)
      ax = fig.subplots(1)
@@ -172,10 +190,10 @@ def plotPrcp():
      #fig, ax = plt.subplots()
      fig = plt.figure(dpi=200)
      ax = fig.subplots(1)
-     d = temp.Date
-     ax.plot(d,temp.Middel, linewidth=1)
-     ax.plot(d,temp.Laveste, '--', linewidth=0.3)
-     ax.plot(d, temp.Højeste, '--', linewidth=0.3)
+     d = temp1920.Date
+     ax.plot(d,temp1920.Middel, linewidth=1)
+     ax.plot(d,temp1920.Laveste, '--', linewidth=0.3)
+     ax.plot(d, temp1920.Højeste, '--', linewidth=0.3)
      #ax.set_xticks(ax.get_xticks()[::10])
       #ax.xticks.set_tick_params()
      #ax.set_title('Temperatures at Qeqertarsuaq Heliport')
@@ -184,3 +202,19 @@ def plotPrcp():
      fig.autofmt_xdate(bottom=0.2)
      fig.subplots_adjust(bottom=0.24)
      fig.show()
+     
+def align_yaxis_np(ax1, ax2):
+    """Align zeros of the two axes, zooming them out by same ratio"""
+    axes = np.array([ax1, ax2])
+    extrema = np.array([ax.get_ylim() for ax in axes])
+    tops = extrema[:,1] / (extrema[:,1] - extrema[:,0])
+    # Ensure that plots (intervals) are ordered bottom to top:
+    if tops[0] > tops[1]:
+        axes, extrema, tops = [a[::-1] for a in (axes, extrema, tops)]
+
+    # How much would the plot overflow if we kept current zoom levels?
+    tot_span = tops[1] + 1 - tops[0]
+
+    extrema[0,1] = extrema[0,0] + tot_span * (extrema[0,1] - extrema[0,0])
+    extrema[1,0] = extrema[1,1] + tot_span * (extrema[1,0] - extrema[1,1])
+    [axes[i].set_ylim(*extrema[i]) for i in range(2)]

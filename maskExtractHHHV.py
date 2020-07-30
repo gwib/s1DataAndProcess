@@ -156,6 +156,163 @@ def calcMeanSd(boolMsk, pol):
     
     return polMean, polSd
     
+
+def readFcc(fPath):
+    
+    fcc = rio.open(fPath)
+    #print(fcc.meta) # print metadata
+    
+    fcc_hh = fcc.read(1)
+    
+    try: fcc_hv = fcc.read(2)
+    except: fcc_hv = np.nan
+    
+    fcc_hh[fcc_hh == 0] = np.nan
+    fcc_hh[fcc_hh < -999] = np.nan
+    try:
+        fcc_hv[fcc_hv < -999] = np.nan
+        fcc_hv[fcc_hv == 0] = np.nan
+    except: print('HV not available.')
+    
+    #plotPols(fcc_hh, fcc_hv, splitDate)
+    
+    #printMinMax(fcc_hh, fcc_hv)
+    
+    return fcc_hh, fcc_hv
+
+
+####### PLOTS ######
+def plotPols(hh, hv, date):
+    
+    # normalizing colormap to constant boundaries
+    mynorm = plt.Normalize(vmin=-37, vmax=21) #TODO: numbers are subject to change
+    
+    fig, axs = plt.subplots(1, 2)
+    ax1 = axs[0].imshow(hh, interpolation='nearest', cmap='magma', norm=mynorm)
+    fig.colorbar(ax1, ax=axs[0])
+    ax2 = axs[1].imshow(hv, interpolation='nearest', cmap='magma', norm=mynorm)
+    fig.colorbar(ax2, ax=axs[1])
+    
+    axs[0].set_title('HH band')
+    axs[1].set_title('HV band')
+    fig.suptitle('Radiometrically calibrated backscatter from: '+date, fontsize=14)
+    
+def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
+    # Create a figure with customized size
+    fig,ax = plt.subplots(dpi=200)
+    #ax = fig.add_subplot(111)
+    
+    # Set the axis lables
+    #ax.set_xlabel('Date',fontsize=14)
+    ax.set_ylabel(r'Mean backscatter in $dB$',fontsize=12)
+    
+    # X axis is day numbers from 1 to 15
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    #print(dates)
+    xaxis = dates
+    
+    # Y values
+    HHmean_y = []
+    HVmean_y = []
+    HHsd = []
+    HVsd = []
+    for d in dates:
+        HHmean_y.append(hhMeanDict[d])
+        HVmean_y.append(hvMeanDict[d])
+        HHsd.append(hhSdDict[d])
+        HVsd.append(hvSdDict[d])
+    
+    # Line color for error bar
+    color_HH = colorDict['orange'] # orange
+    color_HV = colorDict['green'] # green
+    
+    # Line style for each dataset
+    lineStyle_HH={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
+    lineStyle_HV={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
+    
+    # Create an error bar for each dataset
+    line_HH=ax.errorbar(xaxis, HHmean_y, yerr=HHsd, **lineStyle_HH, color=color_HH, label='HH')
+    line_HV=ax.errorbar(xaxis, HVmean_y, yerr=HVsd, **lineStyle_HV, color=color_HV, label='HV')
+      
+    
+    # Draw a legend bar
+    plt.legend(handles=[line_HH, line_HV],bbox_to_anchor=(1.05, 1.0), loc='upper left')
+    plt.tight_layout()
+    
+    
+    # Customize the tickes on the graph
+    #plt.xticks(xaxis,rotation=45,fontsize=8)           
+    #plt.xlabel('Date',fontsize=10)    
+    #plt.yticks(np.arange(20, 47, 2))
+    
+    # Customize the legend font and handle length
+    params = {'legend.fontsize': 12,
+              'legend.handlelength': 2}
+    plt.rcParams.update(params)
+
+    
+    # Draw a grid for the graph
+    plt.grid(color=colorDict['black15'])
+    
+    for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.2)#bottom=0.34, right=0.15)
+    #ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
+    
+    plt.show()
+    if len(saveFile) > 0:
+        plt.savefig(saveFile)
+
+def plotMeans(hhMeanDict, hvMeanDict):
+    hh = []
+    hv =  [] 
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    for d in dates:
+        hh.append(hhMeanDict[d])
+        hv.append(hvMeanDict[d])
+        
+    plt.scatter(hh,hv)
+    plt.xlabel('HH')
+    plt.ylabel('HV')
+    plt.show()
+
+def plotMeanDiff(hhMeanDict, hvMeanDict):
+    hh = []
+    hv = []
+    dates = list(hhMeanDict.keys())
+    dates.sort()
+    for d in dates:
+        hh.append(hhMeanDict[d])
+        hv.append(hvMeanDict[d])
+    hhMinusHv = [a_i - b_i for a_i, b_i in zip(hh, hv)]
+    
+    fig,ax = plt.subplots(dpi=180)
+    ax.plot(dates, hhMinusHv, color=colorDict['darkYellow'])
+    plt.grid(color=colorDict['black15'])
+    #plt.xticks(dates,rotation=45)
+    plt.ylabel(r'HH - HV in $dB$', fontsize=13)
+    #plt.ylim(bottom=6,top=10.5)
+    
+    for ax in fig.get_axes():
+        if ax.is_last_row():
+            for label in ax.get_xticklabels():
+                label.set_ha('right')
+                label.set_rotation(30.)
+        else:
+            for label in ax.get_xticklabels():
+                label.set_visible(False)
+            ax.set_xlabel('')
+    fig.subplots_adjust(bottom=0.15)
+    
 def maskedHistogram(boolMsk,direc,pltDir):
     for entry in os.scandir(direc):
         if entry.path.endswith(".tif") and entry.is_file():
@@ -244,159 +401,6 @@ def maskedHistogram(boolMsk,direc,pltDir):
         fig_HHHV.savefig(figName_HHHV)
 
 
-def readFcc(fPath):
-    
-    fcc = rio.open(fPath)
-    #print(fcc.meta) # print metadata
-    
-    fcc_hh = fcc.read(1)
-    
-    try: fcc_hv = fcc.read(2)
-    except: fcc_hv = np.nan
-    
-    fcc_hh[fcc_hh == 0] = np.nan
-    fcc_hh[fcc_hh < -999] = np.nan
-    try:
-        fcc_hv[fcc_hv < -999] = np.nan
-        fcc_hv[fcc_hv == 0] = np.nan
-    except: print('HV not available.')
-    
-    #plotPols(fcc_hh, fcc_hv, splitDate)
-    
-    #printMinMax(fcc_hh, fcc_hv)
-    
-    return fcc_hh, fcc_hv
-
-
-####### PLOTS ######
-def plotPols(hh, hv, date):
-    
-    # normalizing colormap to constant boundaries
-    mynorm = plt.Normalize(vmin=-37, vmax=21) #TODO: numbers are subject to change
-    
-    fig, axs = plt.subplots(1, 2)
-    ax1 = axs[0].imshow(hh, interpolation='nearest', cmap='magma', norm=mynorm)
-    fig.colorbar(ax1, ax=axs[0])
-    ax2 = axs[1].imshow(hv, interpolation='nearest', cmap='magma', norm=mynorm)
-    fig.colorbar(ax2, ax=axs[1])
-    
-    axs[0].set_title('HH band')
-    axs[1].set_title('HV band')
-    fig.suptitle('Radiometrically calibrated backscatter from: '+date, fontsize=14)
-    
-def plotMeanSd(hhMeanDict, hhSdDict, hvMeanDict, hvSdDict, saveFile=''):
-    # Create a figure with customized size
-    fig,ax = plt.subplots(dpi=180)
-    #ax = fig.add_subplot(111)
-    
-    # Set the axis lables
-    #ax.set_xlabel('Date',fontsize=14)
-    ax.set_ylabel(r'Mean $\sigma_0$ in $dB$',fontsize=13)
-    
-    # X axis is day numbers from 1 to 15
-    dates = list(hhMeanDict.keys())
-    dates.sort()
-    #print(dates)
-    xaxis = dates
-    
-    # Y values
-    HHmean_y = []
-    HVmean_y = []
-    HHsd = []
-    HVsd = []
-    for d in dates:
-        HHmean_y.append(hhMeanDict[d])
-        HVmean_y.append(hvMeanDict[d])
-        HHsd.append(hhSdDict[d])
-        HVsd.append(hvSdDict[d])
-    
-    # Line color for error bar
-    color_HH = colorDict['orange'] # orange
-    color_HV = colorDict['green'] # green
-    
-    # Line style for each dataset
-    lineStyle_HH={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
-    lineStyle_HV={"linestyle":"-", "linewidth":2, "markeredgewidth":1, "elinewidth":0.8, "capsize":1}
-    
-    # Create an error bar for each dataset
-    line_HH=ax.errorbar(xaxis, HHmean_y, yerr=HHsd, **lineStyle_HH, color=color_HH, label='HH')
-    line_HV=ax.errorbar(xaxis, HVmean_y, yerr=HVsd, **lineStyle_HV, color=color_HV, label='HV')
-      
-    
-    # Draw a legend bar
-    plt.legend(handles=[line_HH, line_HV], loc='upper right')
-    
-    # Customize the tickes on the graph
-    #plt.xticks(xaxis,rotation=45,fontsize=8)           
-    #plt.xlabel('Date',fontsize=10)    
-    #plt.yticks(np.arange(20, 47, 2))
-    
-    # Customize the legend font and handle length
-    params = {'legend.fontsize': 12,
-              'legend.handlelength': 2}
-    plt.rcParams.update(params)
-
-    
-    # Draw a grid for the graph
-    plt.grid(color=colorDict['black15'])
-    
-    for ax in fig.get_axes():
-        if ax.is_last_row():
-            for label in ax.get_xticklabels():
-                label.set_ha('right')
-                label.set_rotation(30.)
-        else:
-            for label in ax.get_xticklabels():
-                label.set_visible(False)
-            ax.set_xlabel('')
-    fig.subplots_adjust(bottom=0.15)
-    #ax.set_title('Mean Backscatter of glaciarised areas', fontsize=16)
-    
-    plt.show()
-    if len(saveFile) > 0:
-        plt.savefig(saveFile)
-
-def plotMeans(hhMeanDict, hvMeanDict):
-    hh = []
-    hv =  [] 
-    dates = list(hhMeanDict.keys())
-    dates.sort()
-    for d in dates:
-        hh.append(hhMeanDict[d])
-        hv.append(hvMeanDict[d])
-        
-    plt.scatter(hh,hv)
-    plt.xlabel('HH')
-    plt.ylabel('HV')
-    plt.show()
-
-def plotMeanDiff(hhMeanDict, hvMeanDict):
-    hh = []
-    hv = []
-    dates = list(hhMeanDict.keys())
-    dates.sort()
-    for d in dates:
-        hh.append(hhMeanDict[d])
-        hv.append(hvMeanDict[d])
-    hhMinusHv = [a_i - b_i for a_i, b_i in zip(hh, hv)]
-    
-    fig,ax = plt.subplots(dpi=180)
-    ax.plot(dates, hhMinusHv, color=colorDict['yellow'])
-    plt.grid(color=colorDict['black15'])
-    #plt.xticks(dates,rotation=45)
-    plt.ylabel(r'HH [$dB$] - HV [$dB$]', fontsize=13)
-    #plt.ylim(bottom=6,top=10.5)
-    
-    for ax in fig.get_axes():
-        if ax.is_last_row():
-            for label in ax.get_xticklabels():
-                label.set_ha('right')
-                label.set_rotation(30.)
-        else:
-            for label in ax.get_xticklabels():
-                label.set_visible(False)
-            ax.set_xlabel('')
-    fig.subplots_adjust(bottom=0.15)
     
     
 ###### HELPER FUNCTIONS #####
@@ -429,3 +433,4 @@ def binCmap(base_cmap):
     color_list = base(np.linspace(0, 1, N))
     cmap_name = base.name + str(N)
     return base.from_list(cmap_name, color_list, N)
+

@@ -11,6 +11,8 @@ import numpy as np
 from collections import Counter
 import matplotlib.pyplot as plt
 from colours import colorDict
+from sklearn.utils import shuffle
+import squarify
 
 geolFile = '/Volumes/ElementsSE/thesisData/Datasets/geologicalMap/diskoGeology.csv'
 
@@ -41,6 +43,24 @@ geolNames[6] = f'Rock Slides'
 geolNames[8] = f'Glaciofluvial \n and Marine \n Deposits'
 geolNames[9] = f'Un-\ndifferentiated\nDeposits'
 
+
+geolNamesPlot = {}
+geolNamesPlot[1] = f'Volcanic Rocks'
+geolNamesPlot[2] = 'Ice'
+geolNamesPlot[3] = 'Lake'
+geolNamesPlot[4] = f'Marine Sandstone'
+geolNamesPlot[5] = f'Non-marine Sandstone'
+geolNamesPlot[6] = f'Rock Slides'
+#geolNames[7] = 'Fossils'
+geolNamesPlot[8] = f'Glaciofluvial and Marine Deposits'
+geolNamesPlot[9] = f'Undifferentiated Deposits'
+
+
+geolColours = [colorDict['darkBlue'],colorDict['azure'],colorDict['darkGreen'],
+               colorDict['darkOrange'], colorDict['darkRed'], colorDict['darkYellow'],
+               colorDict['black85'], colorDict['black75']
+               ]
+
 def groupGeol():
     geolDiskoGroup = geolDisko.copy()
     geolDiskoGroup['geol_group'] = geolDiskoGroup['GM_LABEL'].apply(lambda x: strInGroup(x))
@@ -65,15 +85,76 @@ geoTypesDisko['area_perc'] = geoTypesDisko.SHAPE_Area.apply(lambda x: x/totalAre
 def plotGeology():
     xax = []
     for i in geoTypesDisko.index:
-        xax.append(geolNames[i])
+        xax.append(geolNamesPlot[i])
+    print(xax)    
+    
+    fig, ax = plt.subplots()
+    ax.bar(xax, geoTypesDisko.area_perc, color=colorDict['darkYellow'])
+    ax.set_ylabel('Area coverage for geology type in  $\%$', fontsize=14)
+    ax.set_xticks(list(geoTypesDisko.index),xax)#, rotation=45, fontsize=8)
+    fig.set_dpi(200)
+    fig.subplots_adjust(left=0.2)
+    fig.show()
+
+def plotGeoPie():
+    fig, ax = plt.subplots(dpi=200,subplot_kw=dict(aspect="equal"))
+    
+    # Data to plot
+    labels = []
+    for i in geoTypesDisko.index:
+        labels.append(geolNamesPlot[i])
+    
+    
+    geoTypePerc = list(geoTypesDisko.area_perc)
+    
+    
+    print(len(geoTypePerc))
+    #X, y = shuffle(labels,geoTypePerc,random_state=33)
+    p = np.array([0,6,3,7,2,1,5,4])
+    p = p.astype(int)
+    
+    geoPerc_ordered = []
+    label_ordered = []
+    geoCol_ordered = []
+    for i in p:
+        geoPerc_ordered.append(geoTypePerc[i])
+        label_ordered.append(labels[i])
+        geoCol_ordered.append(geolColours[i])
         
-    plt.bar(geoTypesDisko.index, geoTypesDisko.area_perc, color=colorDict['darkYellow'])
+        
+    # Plot
+    wedges, texts, autotexts = ax.pie(geoPerc_ordered, labels=label_ordered, colors=geoCol_ordered,
+    autopct='%1.1f%%', shadow=False, startangle=110)
     
+    plt.setp(autotexts,size=10)
+
+    return labels, geoTypePerc
+
+def plotGeoTree():
+    labels = []
+    for i in geoTypesDisko.index:
+        labels.append(geolNamesPlot[i])
     
+    fig, ax = plt.subplots(dpi=200,subplot_kw=dict(aspect="equal"))
+    geoTypePerc = list(geoTypesDisko.area_perc)
     
-    plt.xticks(list(geoTypesDisko.index),xax, rotation=45, fontsize=8)
-    plt.tick_params('x',length=5)
-    plt.ylabel('Area coverage in $\%$', fontsize=14)
+    squarify.plot(sizes=geoTypePerc, label=labels,color=geolColours)#,alpha=.4)
+    plt.axis('off')
     plt.show()
-
-
+    
+    p = np.array([0,6,3,7,2,1,5,4])
+    p = p.astype(int)
+    
+    geoPerc_ordered = []
+    label_ordered = []
+    geoCol_ordered = []
+    for i in p:
+        geoPerc_ordered.append(geoTypePerc[i])
+        label_ordered.append(labels[i])
+        geoCol_ordered.append(geolColours[i])
+        
+    fig2, ax2 = plt.subplots(dpi=200,subplot_kw=dict(aspect="equal"))
+        
+    ax2.squarify.plot(sizes=geoPerc_ordered, label=label_ordered,color=geoCol_ordered)#,alpha=.4)
+    ax2.axis('off')
+    plt.show()
