@@ -64,9 +64,10 @@ def plotHistogramsForTifNoFlatten(filepath, targetDir=''):
     
     splitDate = dateFromFilename(os.path.split(filepath)[-1])
     print(splitDate)
-    figName = targetDir+'hist_'+str(splitDate.date())+'.pdf'
+    figName = targetDir+'hist_'+str(splitDate.date())
     print(figName)
     HH, HV = readBands(filepath)
+    hhhv = HH - HV
     # flatten tif values, such that histogram can be in one colour
 
     
@@ -74,14 +75,15 @@ def plotHistogramsForTifNoFlatten(filepath, targetDir=''):
         raise Exception('HV band of file '+filepath+' is empty! \n Plotting histogram for HH band only')
         plt.hist(HH,color=colorDict['green'])
         plt.ylabel('Pixel Count')
-        plt.xlabel('HH backscatter ([$\sigma_0$]==dB)')
+        plt.xlabel('HH backscatter in $dB$')
         #plt.title('HH reflection histogram for the entire image')
     else:
         # subplot with shared x-axis
         fig=plt.figure(dpi=200)
-        ax1, ax2 = fig.subplots(2)
+        ax1 = fig.subplots(1)
         #ax1 = fig.subplot(211)
         #ax2 = fig.subplot(212)
+        fig2,ax2 = plt.subplots(dpi=200)
         
         ax1.hist(HH,color=[colorDict['green']]*11908)
         ax2.hist(HV,color=[colorDict['orange']]*11908)
@@ -92,18 +94,38 @@ def plotHistogramsForTifNoFlatten(filepath, targetDir=''):
         ax2.set_ylabel('Pixel Count')
         ax1.set_xlim(-32,13)
         ax2.set_xlim(-32,13)
+        ax1.set_ylim(0,5000)
+        ax2.set_ylim(0,5000)
+        
+    
+        fig3,ax3 = plt.subplots(dpi=200)
+        
+        
+        ax3.hist(hhhv,color=[colorDict['darkYellow']]*11908)
+        
+        ax3.set_xlim(-5, 20)
+        ax3.set_xlabel('HH/HV backscatter ratio')
+        ax3.set_ylabel('Pixel Count')
+        
+    fig.subplots_adjust(bottom=0.15)
+    fig2.subplots_adjust(bottom=0.15)
+    fig3.subplots_adjust(bottom=0.18)
         #fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
         
-        ax1.get_shared_x_axes().join(ax1, ax2)
+        #ax1.get_shared_x_axes().join(ax1, ax2)
         #ax1.set_xticklabels([])
         # ax2.autoscale() ## call autoscale if needed
     
-    fig.subplots_adjust(hspace=0.472, bottom=0.15)
-    plt.show()
+    #fig.subplots_adjust(hspace=0.472, bottom=0.15)
+    #fig.show()
+    #fig2.show()
+    #fig3.show()
     Path(targetDir).mkdir(parents=True, exist_ok=True)
     
     
-    plt.savefig(figName)
+    fig.savefig(figName+'_HH.png')
+    fig2.savefig(figName+'_HV.png')
+    fig3.savefig(figName+'_HHHV.png')
 
 
 
@@ -126,7 +148,7 @@ def plotHistogramsForTif(filepath, targetDir=''):
         raise Exception('HV band of file '+filepath+' is empty! \n Plotting histogram for HH band only')
         plt.hist(HH_flat,color=colorDict['green'])
         plt.ylabel('Pixel Count')
-        plt.xlabel('HH backscatter ([$\sigma_0$]==dB)')
+        plt.xlabel('HH backscatter in $dB$')
         #plt.title('HH reflection histogram for the entire image')
     else:
         # subplot with shared x-axis
@@ -142,8 +164,8 @@ def plotHistogramsForTif(filepath, targetDir=''):
         ax1.set_xlim(-32,13)
         ax2.set_xlim(-32,13)
         
-        ax1.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
-        ax2.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
+        ax1.set_xlabel('HH backscatter in $dB$)')
+        ax2.set_xlabel('HV backscatter $dB$')
         ax1.set_ylabel('Pixel Count')
         ax2.set_ylabel('Pixel Count')
         #fig.suptitle('Histogram for polarisation on '+str(splitDate.date()), fontsize=14)
@@ -159,7 +181,7 @@ def plotHistogramsForTif(filepath, targetDir=''):
     
     plt.savefig(figName)
 
-def histForEachPol(fp,targetDir):
+def histForEachPol(fp,targetDir=''):
     if len(targetDir) < 1:
         targetDir = os.path.dirname(fp)+'/hist/'
     Path(targetDir).mkdir(parents=True, exist_ok=True)
@@ -176,7 +198,7 @@ def histForEachPol(fp,targetDir):
         raise Exception('HV band of file '+fp+' is empty! \n Plotting histogram for HH band only')
         plt.hist(HH_flat,color=colorDict['green'])
         plt.ylabel('Pixel Count')
-        plt.xlabel('HH backscatter ([$\sigma_0$]=dB)')
+        plt.xlabel('HH backscatter in $dB$')
         plt.savefig(figName)
         plt.show()
         return
@@ -196,8 +218,8 @@ def histForEachPol(fp,targetDir):
         ax_HH.hist(HH_flat,color=colorDict['green'])#, bins=12)
         #ax_HH.hist(HH)
         ax_HH.set_xlim(-32,13)
-        ax_HH.set_ylim(0,3.55e7)
-        ax_HH.set_xlabel('HH backscatter ([$\sigma_0$] = dB)')
+        ax_HH.set_ylim(0,4e7)
+        ax_HH.set_xlabel('HH backscatter in $dB$')
         ax_HH.set_ylabel('Pixel Count')
         fig_HH.subplots_adjust(bottom=0.24)
         plt.show()
@@ -207,8 +229,8 @@ def histForEachPol(fp,targetDir):
         ax_HV = fig_HV.subplots(1)
         ax_HV.hist(HV_flat,color=colorDict['orange'])#, bins=12)
         ax_HV.set_xlim(-32,13)
-        ax_HV.set_ylim(0,3.55e7)
-        ax_HV.set_xlabel('HV backscatter ([$\sigma_0$] = dB)')
+        ax_HV.set_ylim(0,4e7)
+        ax_HV.set_xlabel('HV backscatter in $dB$')
         ax_HV.set_ylabel('Pixel Count')
         fig_HV.subplots_adjust(bottom=0.24)
         plt.show()
@@ -223,7 +245,7 @@ def histForEachPol(fp,targetDir):
         ax_HHHV.hist(HHHV_flat,color=colorDict['darkYellow'])
         ax_HHHV.set_xlim(0,30)
         ax_HHHV.set_ylim(0,6e7)
-        ax_HHHV.set_xlabel('HH/HV backscatter ratio ([$\sigma_0$] = dB)')
+        ax_HHHV.set_xlabel('HH/HV backscatter ratio in $dB$')
         ax_HHHV.set_ylabel('Pixel Count')
         fig_HHHV.subplots_adjust(bottom=0.24)
         plt.show()
@@ -267,6 +289,9 @@ def histForEachPols2(inFolder, histFolder):
     for f in os.listdir(inFolder):
         if f.endswith('.tif'):
             histForEachPol(inFolder+f, histFolder)
+
+
+
 
 #TODO:
     # histogram between HH/HV ratio
